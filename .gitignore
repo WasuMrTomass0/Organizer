@@ -1,0 +1,6 @@
+# Ignored files
+ignored
+# Python venv directory
+venv
+# Drawio temp files
+doc/.$*
