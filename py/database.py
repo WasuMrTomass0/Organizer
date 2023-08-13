@@ -20,10 +20,10 @@ class Database:
         #
         self._connection = None
         #
-        self._connect()
+        self.connect()
         pass
 
-    def _connect(self) -> None:
+    def connect(self) -> None:
         if not self._connection:
             self._connection = pymysql.connect(
                 host=self._host,
