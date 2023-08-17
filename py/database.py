@@ -1,4 +1,8 @@
 import pymysql
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class Database:
@@ -24,6 +28,8 @@ class Database:
         pass
 
     def connect(self) -> None:
+        """Connet mysql object
+        """
         if not self._connection:
             self._connection = pymysql.connect(
                 host=self._host,
@@ -32,20 +38,40 @@ class Database:
                 port=self._port,
                 database=self._name
             )
+            logger.debug(f'Database {self._name} connected')
 
     def disconnect(self) -> None:
+        """Disconnet mysql object
+        """
         if self._connection:
             self._connection.close()
+            logger.debug(f'Database {self._name} disconnected')
 
-    def is_table(self, name: str):
-        return name in self.get_tables()
+    def is_table(self, name: str) -> bool:
+        """Checks if table exists
+
+        Args:
+            name (str): Table name
+
+        Returns:
+            bool: True if exists
+        """
+        return name in self.get_table_names()
 
     def create_table(self, name: str, description: str):
+        """Create mySQL table
+
+        Args:
+            name (str): Name of the table
+            description (str): Description of table
+        """
         # Create a cursor object to interact with the database
         with self._connection.cursor() as cursor:
             # SQL query to show all tables in the specified database
             query = f"CREATE TABLE {name} ({description})"
             cursor.execute(query)
+
+        logger.debug(f'Created new table "{name}" in database {self._name}')
 
     def get_table(self, name: str):
         # Create a cursor object to interact with the database
@@ -69,21 +95,28 @@ class Database:
             ret = [t[0] for t in tables]
             return ret
 
-    def insert_single_data(self, name: str, keys: str, data: tuple):
+    def insert_single_data(self, name: str, keys: "tuple[str]", data: tuple):
+        # Create strings from tuple
+        keys = ', '.join(keys)  # 'name, surname, age'
+        values = ', '.join(['%s'] * len(keys))  # '%s, %s, %s'
         # Create a cursor object to interact with the database
         with self._connection.cursor() as cursor:
             # SQL query to show all tables in the specified database
-            query = f"INSERT INTO {name} ({keys}) VALUES (%s, %s)"
+            query = f"INSERT INTO {name} ({keys}) VALUES ({values})"
             cursor.execute(query, data)
             self._connection.commit()
             # id of last added entry
             return cursor.lastrowid
 
-    def insert_data(self, name: str, keys: str, data: tuple[tuple]):
+    def insert_data(self, name: str, keys: "tuple[str]", data: "tuple[tuple]"):
+        # Create strings from tuple
+        keys = ', '.join(keys)  # 'name, surname, age'
+        values = ', '.join(['%s'] * len(keys))  # '%s, %s, %s'
+
         # Create a cursor object to interact with the database
         with self._connection.cursor() as cursor:
             # SQL query to show all tables in the specified database
-            query = f"INSERT INTO {name} ({keys}) VALUES (%s, %s)"
+            query = f"INSERT INTO {name} ({keys}) VALUES ({values})"
             cursor.executemany(query, data)
             self._connection.commit()
             # id of last added entry
@@ -93,7 +126,7 @@ class Database:
 
 
 if __name__ == '__main__':
-    # 
+    #
     db = Database(
         host='192.168.100.196',
         port=3307,
@@ -120,12 +153,12 @@ if __name__ == '__main__':
             print()
 
             # # Insert single data
-            # keys = "name, age"
+            # keys = ('name', 'age')
             # data = ('Tomek', 24)
             # db.insert_single_data(name, keys, data)
 
             # # Insert data
-            # keys = "name, age"
+            # keys = ('name', 'age')
             # data = (
             #     ('Tomek', 21),
             #     ('Alfons', 22),

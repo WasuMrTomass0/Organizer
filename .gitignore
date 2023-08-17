@@ -1,6 +1,7 @@
 # Ignored files
 ignored
 # Python venv directory
+*\__pycache__
 venv
 # Drawio temp files
 doc/.$*
