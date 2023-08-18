@@ -70,7 +70,7 @@ DELETE FROM containers
 WHERE id = 1;
 ```
 
-## Elements "elements"
+## Stored items "stored_items"
 
 <!-- The goal: -->
 <!-- | id          | containerid    | name        | description [O]    | category [O]   | image [O]      | created    | last edited|
@@ -83,7 +83,7 @@ WHERE id = 1;
 | `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "binary_image" | timestamp  | timestamp  |
 
 ```sql
-CREATE TABLE elements (
+CREATE TABLE stored_items (
     id INT AUTO_INCREMENT NOT NULL,
     containerid INT,
     name VARCHAR(255) NOT NULL,

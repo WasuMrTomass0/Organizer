@@ -48,32 +48,33 @@ class DatabaseMngr:
             logger.debug(f'DatabaseMngr {self._name} disconnected')
 
     def is_table(self, name: str) -> bool:
-        """Checks if table exists
-
-        Args:
-            name (str): Table name
-
-        Returns:
-            bool: True if exists
+        """Checks if table {name} exists
         """
         return name in self.get_table_names()
 
-    def create_table(self, name: str, description: str):
+    def create_table(self, name: str, description: str, options: str = None):
         """Create mySQL table
 
         Args:
             name (str): Name of the table
-            description (str): Description of table
+            description (str): Description of table - content od parentheses
+            options (str): Additional options to table. Defaults to None (empty string)
         """
-        # Create a cursor object to interact with the database
+        options = options if options else ''
+        query = f"CREATE TABLE {name} ({description}) {options};"
         with self._connection.cursor() as cursor:
-            # SQL query to show all tables in the specified database
-            query = f"CREATE TABLE {name} ({description})"
             cursor.execute(query)
-
         logger.debug(f'Created new table "{name}" in database {self._name}')
 
-    def get_table(self, name: str):
+    def get_data(self, name: str) -> "tuple[tuple, tuple]":
+        """Get all rows from table
+
+        Args:
+            name (str): Name of the table read from
+
+        Returns:
+            tuple[tuple, tuple]: column_names, rows
+        """
         # Create a cursor object to interact with the database
         with self._connection.cursor() as cursor:
             # SQL query to show all tables in the specified database
@@ -84,7 +85,29 @@ class DatabaseMngr:
             table = cursor.fetchall()
             return column_names, table
 
+    def get_data_with_condition(self, name: str, condition: str) -> "tuple[tuple, tuple]":
+        """Get all rows from table that satisfy condition
+
+        Args:
+            name (str): Name of the table read from
+            condition (str): Condition to satisfy
+
+        Returns:
+            tuple[tuple, tuple]: column_names, rows
+        """
+        # Create a cursor object to interact with the database
+        with self._connection.cursor() as cursor:
+            # SQL query to show all tables in the specified database
+            query = f"SELECT * FROM {name} WHERE {condition};"
+            cursor.execute(query)
+            columns = cursor.description
+            column_names = [elem[0] for elem in columns]
+            table = cursor.fetchall()
+            return column_names, table
+
     def get_table_names(self):
+        """Get all table names from database
+        """
         # Create a cursor object to interact with the database
         with self._connection.cursor() as cursor:
             # SQL query to show all tables in the specified database
@@ -95,7 +118,9 @@ class DatabaseMngr:
             ret = [t[0] for t in tables]
             return ret
 
-    def insert_single_data(self, name: str, keys: "tuple[str]", data: tuple):
+    def insert_entry(self, name: str, keys: "tuple[str]", data: tuple):
+        # TODO: Maybe dict should represent data?
+
         # Create strings from tuple
         keys = ', '.join(keys)  # 'name, surname, age'
         values = ', '.join(['%s'] * len(keys))  # '%s, %s, %s'
@@ -108,7 +133,9 @@ class DatabaseMngr:
             # id of last added entry
             return cursor.lastrowid
 
-    def insert_data(self, name: str, keys: "tuple[str]", data: "tuple[tuple]"):
+    def insert_entries(self, name: str, keys: "tuple[str]", data: "tuple[tuple]"):
+        # TODO: Maybe dict should represent data?
+
         # Create strings from tuple
         keys = ', '.join(keys)  # 'name, surname, age'
         values = ', '.join(['%s'] * len(keys))  # '%s, %s, %s'
@@ -146,7 +173,7 @@ if __name__ == '__main__':
             db.create_table(name, description)
         # Print table
         if exists:
-            column_names, table = db.get_table(name)
+            column_names, table = db.get_data(name)
             print(column_names)
             for row in table:
                 print(row)
@@ -155,7 +182,7 @@ if __name__ == '__main__':
             # # Insert single data
             # keys = ('name', 'age')
             # data = ('Tomek', 24)
-            # db.insert_single_data(name, keys, data)
+            # db.insert_entry(name, keys, data)
 
             # # Insert data
             # keys = ('name', 'age')
@@ -166,7 +193,7 @@ if __name__ == '__main__':
             #     ('Zgredek', 24),
             #     ('Runcajs', 25),
             # )
-            # db.insert_data(name, keys, data)
+            # db.insert_entries(name, keys, data)
 
     # Disconect from db
     db.disconnect()
