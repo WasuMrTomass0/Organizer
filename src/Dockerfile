@@ -1,2 +1,0 @@
-FROM PYTHON:3
-
