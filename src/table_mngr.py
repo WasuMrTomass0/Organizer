@@ -1,11 +1,11 @@
 import logging
-from database import Database
+from database_mngr import Database
 
 
 logger = logging.getLogger(__name__)
 
 
-class TableHandler:
+class TableMngr:
 
     def __init__(
             self,
