@@ -10,25 +10,67 @@ Column labels:
 
 - `[O]` - optional
 
-### Containers "containers"
 
-| id          | name        | location [O]   | description [O]    |
-|-------------|-------------|----------------|--------------------|
-| `x0132af`   | "BOX001"    | "Attic"        | "Shelf 1, Green"   |
+## Containers "containers"
+
+| id          | location [O]   | description [O]    |
+|-------------|----------------|--------------------|
+| `x0132af`   | "Attic"        | "Shelf 1, Green"   |
 <!-- | `x000001`   | "in-use"    | "in-use"       | "Out of the box"   | -->
 
 ```sql
 CREATE TABLE containers (
     id INT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     description TEXT,
 
-    PRIMARY KEY (id)
-);
+    PRIMARY KEY (id),
+    UNIQUE (name)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### Elements "elements"
+### Add container
+
+all values
+
+```sql
+INSERT INTO containers
+VALUES ("Attic", "Big black container");
+```
+
+not all values
+
+```sql
+INSERT INTO containers (description)
+VALUES ("Big black container");
+```
+
+### Edit container
+
+all values
+
+```sql
+UPDATE containers
+SET location = "Garage",
+    description = "Shelf 1, Green"
+WHERE id = 1;
+```
+
+not all values
+
+```sql
+UPDATE containers
+SET description = "Shelf 1, Green"
+WHERE id = 1;
+```
+
+### Remove container
+```sql
+DELETE FROM containers
+WHERE id = 1;
+```
+
+## Elements "elements"
 
 <!-- The goal: -->
 <!-- | id          | containerid    | name        | description [O]    | category [O]   | image [O]      | created    | last edited|
@@ -51,8 +93,8 @@ CREATE TABLE elements (
     edited TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    CONSTRAINT FK_containerid FOREIGN KEY (containerid) REFERENCES containers(id)
-);
+    FOREIGN KEY (containerid) REFERENCES containers(id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 <!-- ## TODO
