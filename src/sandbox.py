@@ -4,8 +4,8 @@ Test/Sandbox file used for manual testing
 import logging.config
 logging.config.fileConfig('logging.conf')
 
-from database import Database
-from table_handler import TableHandler
+from database_mngr import DatabaseMngr
+from table_mngr import TableMngr
 
 
 # Containers table
@@ -47,7 +47,7 @@ def main():
     logger.error(f'Test message')
 
     # Create database handler
-    db = Database(
+    db = DatabaseMngr(
         host='192.168.100.196',
         port=3307,
         user='organizer',
@@ -56,14 +56,14 @@ def main():
     )
 
     # Create table handler - containers
-    tb_containers = TableHandler(
+    tb_containers = TableMngr(
         db=db,
         name=T_CONT_NAME,
         keys=T_CONT_KEYS,
         description=T_CONT_DESC
     )
     # Create table handler - elements
-    tb_elements = TableHandler(
+    tb_elements = TableMngr(
         db=db,
         name=T_ELEM_NAME,
         keys=T_ELEM_KEYS,
