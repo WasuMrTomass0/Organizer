@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Database:
+class DatabaseMngr:
 
     def __init__(
             self,
@@ -38,14 +38,14 @@ class Database:
                 port=self._port,
                 database=self._name
             )
-            logger.debug(f'Database {self._name} connected')
+            logger.debug(f'DatabaseMngr {self._name} connected')
 
     def disconnect(self) -> None:
         """Disconnet mysql object
         """
         if self._connection:
             self._connection.close()
-            logger.debug(f'Database {self._name} disconnected')
+            logger.debug(f'DatabaseMngr {self._name} disconnected')
 
     def is_table(self, name: str) -> bool:
         """Checks if table exists
@@ -127,7 +127,7 @@ class Database:
 
 if __name__ == '__main__':
     #
-    db = Database(
+    db = DatabaseMngr(
         host='192.168.100.196',
         port=3307,
         user='organizer',
