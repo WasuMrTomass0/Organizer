@@ -153,12 +153,20 @@ class DatabaseMngr:
 
 
 if __name__ == '__main__':
+    # #
+    # db = DatabaseMngr(
+    #     host='192.168.100.196',
+    #     port=3307,
+    #     user='organizer',
+    #     password='UhU*K89AOWx#X41d',
+    #     name='organizer_db',
+    # )
     #
     db = DatabaseMngr(
-        host='192.168.100.196',
-        port=3307,
-        user='organizer',
-        password='UhU*K89AOWx#X41d',
+        host='localhost',
+        port=3306,
+        user='root',
+        password='',
         name='organizer_db',
     )
     # Show existing tables
