@@ -1,5 +1,5 @@
 import logging
-from database_mngr import Database
+from database.database_mngr import DatabaseMngr
 
 
 logger = logging.getLogger(__name__)
@@ -9,7 +9,7 @@ class TableMngr:
 
     def __init__(
             self,
-            db: Database,
+            db: DatabaseMngr,
             name: str,
             keys: "tuple[str]",
             description: str,
