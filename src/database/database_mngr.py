@@ -92,6 +92,7 @@ class DatabaseMngr:
         with self._connection.cursor() as cursor:
             cursor.execute(query)
         logger.info(f'Database "{self._name}" created')
+        self._disconnect()
 
     def is_connected(self) -> bool:
         return self._connection is not None and self._connection.is_connected()
@@ -159,11 +160,16 @@ class DatabaseMngr:
             ret = [t[0] for t in tables]
             return ret
 
-    def insert_entry(self, name: str, keys: "tuple[str]", data: tuple):
+    def insert_entry(
+            self,
+            name: str,
+            keys: "tuple[str]",
+            data: tuple
+        ) -> None:
         # TODO: Maybe dict should represent data?
 
         # Create strings from tuple
-        values = ', '.join(['%s'] * len(keys))  # '%s, %d, %s'
+        values = ', '.join(['%s'] * len(keys))  # '%s, %s, %s'
         keys = ', '.join(keys)  # 'name, surname, age'
         # Create a cursor object to interact with the database
         with self._connection.cursor() as cursor:
@@ -175,7 +181,12 @@ class DatabaseMngr:
             # id of last added entry
             return cursor.lastrowid
 
-    def insert_entries(self, name: str, keys: "tuple[str]", data: "tuple[tuple]"):
+    def insert_entries(
+            self,
+            name: str,
+            keys: "tuple[str]",
+            data: "tuple[tuple]"
+        ) -> None:
         # TODO: Maybe dict should represent data?
 
         # Create strings from tuple
