@@ -87,29 +87,29 @@ class Database:
         self._session.commit()
 
 
-db = Database()
+# db = Database()
 
-print(db.is_table(Container))
-print(db.is_table(StoredItem))
+# print(db.is_table(Container))
+# print(db.is_table(StoredItem))
 
-for e in db.get(Container, condition=Container.id < 5):
-    print(str(e))
+# for e in db.get(Container, condition=Container.id < 5):
+#     print(str(e))
 
 
-for e in db.get(StoredItem):
-    print(str(e))
+# for e in db.get(StoredItem):
+#     print(str(e))
 
-s = StoredItem()
-s.containerid = 1
-s.name = 'Some trousers'
-s.description = 'Some info here'
-db.insert(s)
+# s = StoredItem()
+# s.containerid = 1
+# s.name = 'Some trousers'
+# s.description = 'Some info here'
+# db.insert(s)
 
-import time
-time.sleep(4)
+# import time
+# time.sleep(4)
 
-s.name = 'Some blue trousers'
-db.update(s)
+# s.name = 'Some blue trousers'
+# db.update(s)
 
 # query = ses.query(StoredItem).limit(5)
 # query
