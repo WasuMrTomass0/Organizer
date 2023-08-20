@@ -13,7 +13,7 @@ Column labels:
 
 ## Containers "containers"
 
-| id          | location [O]   | description [O]    |
+| id          | location [O]   | description        |
 |-------------|----------------|--------------------|
 | `x0132af`   | "Attic"        | "Shelf 1, Green"   |
 <!-- | `x000001`   | "in-use"    | "in-use"       | "Out of the box"   | -->
@@ -24,8 +24,7 @@ CREATE TABLE containers (
     location VARCHAR(255),
     description TEXT,
 
-    PRIMARY KEY (id),
-    UNIQUE (name)
+    PRIMARY KEY (id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
@@ -78,9 +77,13 @@ WHERE id = 1;
 | `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "Clothes"      | "binary_image" | timestamp  | timestamp  | -->
 
 <!-- Basic -->
-| id          | containerid    | name        | description [O]    | image [O]      | created    | edited     |
+<!-- | id          | containerid    | name        | description [O]    | image [O]      | created    | edited     |
 |-------------|----------------|-------------|--------------------|----------------|------------|------------|
-| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "binary_image" | timestamp  | timestamp  |
+| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "binary_image" | timestamp  | timestamp  | -->
+
+| id          | containerid    | name        | description [O]    |
+|-------------|----------------|-------------|--------------------|
+| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   |
 
 ```sql
 CREATE TABLE stored_items (
@@ -93,9 +96,13 @@ CREATE TABLE stored_items (
     edited TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
+    KEY (containerid),
     FOREIGN KEY (containerid) REFERENCES containers(id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
+
+<!--
+    UNIQUE (name) -->
 
 <!-- ## TODO
 
