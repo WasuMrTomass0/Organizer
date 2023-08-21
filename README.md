@@ -86,10 +86,10 @@ WHERE id = 1;
 ```sql
 CREATE TABLE stored_items (
     id INT AUTO_INCREMENT NOT NULL,
-    containerid INT,
+    containerid INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    image MEDIUMBLOB,
+    image MEDIUMBLOB NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
