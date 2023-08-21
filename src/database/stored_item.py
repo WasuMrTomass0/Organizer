@@ -1,11 +1,8 @@
 import sqlalchemy as sql
-from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
 
+from database.base import Base
 from database.container import Container
-
-# ORM base class
-Base = declarative_base()
 
 
 class StoredItem(Base):
@@ -19,7 +16,7 @@ class StoredItem(Base):
     image = sql.Column(sql.BLOB)
     created = sql.Column(sql.TIMESTAMP, server_default=func.now())
     edited = sql.Column(sql.TIMESTAMP, onupdate=func.now())
-    
+
     def __str__(self) -> str:
         return f'StoredItem: ' \
             f'id({self.id}), containerid({self.containerid}), ' \

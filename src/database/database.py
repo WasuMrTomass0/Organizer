@@ -17,6 +17,12 @@ class Database:
         self._SessionClass = sessionmaker(bind=self._engine)
         self._open_session()
 
+    def __enter__(self):
+        self._open_session()
+
+    def __exit__(self, *args):
+        self._close_session()
+
     def _open_session(self) -> None:
         self._session = self._SessionClass()
 

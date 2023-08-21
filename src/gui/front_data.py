@@ -7,6 +7,9 @@ class FrontData:
         self._data = {}
         self._exceptions = exceptions
 
+    def clear(self, key: str) -> None:
+        self._data[key] = None
+
     def set(self, key: str, value: Any) -> None:
         self._data[key] = value
 
