@@ -13,7 +13,7 @@ Column labels:
 
 ## Containers "containers"
 
-| id          | location [O]   | description        |
+| id          | location       | description        |
 |-------------|----------------|--------------------|
 | `x0132af`   | "Attic"        | "Shelf 1, Green"   |
 <!-- | `x000001`   | "in-use"    | "in-use"       | "Out of the box"   | -->
@@ -24,7 +24,8 @@ CREATE TABLE containers (
     location VARCHAR(255),
     description TEXT,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (location) REFERENCES locations(name)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
@@ -77,13 +78,10 @@ WHERE id = 1;
 | `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "Clothes"      | "binary_image" | timestamp  | timestamp  | -->
 
 <!-- Basic -->
-<!-- | id          | containerid    | name        | description [O]    | image [O]      | created    | edited     |
+| id          | containerid    | name        | description        | image          | created    | edited     |
 |-------------|----------------|-------------|--------------------|----------------|------------|------------|
-| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "binary_image" | timestamp  | timestamp  | -->
+| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "binary_image" | timestamp  | timestamp  |
 
-| id          | containerid    | name        | description [O]    |
-|-------------|----------------|-------------|--------------------|
-| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   |
 
 ```sql
 CREATE TABLE stored_items (
@@ -126,10 +124,18 @@ Thanks to this entry is not lost (name, image, description).
 | id          | name        |
 |-------------|-------------|
 | `x12`       | "Clothes"   |
-| `x16`       | "Shoes"     |
-### Locations "locations" ?????
+| `x16`       | "Shoes"     |-->
 
-| id          | name        |
-|-------------|-------------|
-| `x12`       | "Garage"    |
-| `x13`       | "Attic"     | -->
+### Locations "locations"
+
+| name        |
+|-------------|
+| "Garage"    |
+| "Attic"     | 
+
+```sql
+CREATE TABLE locations (
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (name)
+) CHARACTER SET utf8mb4 COLLATE UTF8MB4_UNICODE_CI;
+```
