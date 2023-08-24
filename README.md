@@ -14,7 +14,7 @@ Column labels:
 ## Containers "containers"
 
 | id          | location       | description        |
-|-------------|----------------|--------------------|
+|:-----------:|:--------------:|:------------------:|
 | `x0132af`   | "Attic"        | "Shelf 1, Green"   |
 <!-- | `x000001`   | "in-use"    | "in-use"       | "Out of the box"   | -->
 
@@ -74,13 +74,13 @@ WHERE id = 1;
 
 <!-- The goal: -->
 <!-- | id          | containerid    | name        | description [O]    | category [O]   | image [O]      | created    | last edited|
-|-------------|----------------|-------------|--------------------|----------------|----------------|------------|------------|
+|:-----------:|:--------------:|:-----------:|:------------------:|:--------------:|:--------------:|:----------:|:----------:|
 | `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "Clothes"      | "binary_image" | timestamp  | timestamp  | -->
 
 <!-- Basic -->
-| id          | containerid    | name        | description        | image          | created    | edited     |
-|-------------|----------------|-------------|--------------------|----------------|------------|------------|
-| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   | "binary_image" | timestamp  | timestamp  |
+| id          | containerid    | name        | description        | quantity | image          | created    | edited     |
+|:-----------:|:--------------:|:-----------:|:------------------:|:--------:|:--------------:|:----------:|:----------:|
+| `x2135a2`   | `x0132af`      | "Jacket"    | "Producer, Size"   |     1    | "binary_image" | timestamp  | timestamp  |
 
 
 ```sql
@@ -89,7 +89,8 @@ CREATE TABLE stored_items (
     containerid INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    image MEDIUMBLOB NOT NULL,
+    quantity INT NOT NULL,
+    image MEDIUMBLOB,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     edited TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -113,28 +114,16 @@ Note: copy table of "elements" or simple container called "in use"
 Used for elements temporarily taken out from container - in use.
 Thanks to this entry is not lost (name, image, description).
 
-### Users ?????
-
-| id    | username | password |
-|-------|----------|----------|
-| `x69` | `wasu`   | "qwerty" |
-
-### Categories "categories" ?????
-
-| id          | name        |
-|-------------|-------------|
-| `x12`       | "Clothes"   |
-| `x16`       | "Shoes"     |-->
-
 ### Locations "locations"
 
-| name        |
-|-------------|
-| "Garage"    |
-| "Attic"     | 
+| id       | name        |
+|:--------:|:-----------:|
+|     1    | "Garage"    |
+|     2    | "Attic"     |
 
 ```sql
 CREATE TABLE locations (
+    -- id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY (name)
 ) CHARACTER SET utf8mb4 COLLATE UTF8MB4_UNICODE_CI;

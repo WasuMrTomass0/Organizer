@@ -1,5 +1,7 @@
 import logging
 
+
+
 from database.database import Database
 from database.locations import Location
 from database.container import Container
@@ -34,10 +36,10 @@ class Organizer:
     def get_locations(self) -> "list[Location]":
         with self._db:
             return self._db.get(Location)
-    
+
     def get_location_names(self) -> "list[str]":
         return sorted([str(d) for d in self.get_locations()])
-    
+
     def get_locations_grid(self) -> dict:
         return {
             'columnDefs': [
@@ -63,7 +65,23 @@ class Organizer:
     def get_containers(self) -> "list[Container]":
         with self._db:
             return self._db.get(Container)
-    
+
+    def get_containers_select(self) -> "dict[int, str]":
+        """Returns dict made of containers for select.
+        {containerid: name, ...}
+
+        Returns:
+            dict[int, str]: nicegui's select's input
+        """
+        def limit(s: str) -> str:
+            length = 50
+            s = s.replace('\n', '; ')
+            return (s[:length]+'...') if len(s) > length else s
+        return {
+            c.id: f'{c.id}: {limit(c.description)}' for c in self.get_containers()
+        }
+
+
     def get_containers_grid(self) -> dict:
         return {
             'columnDefs': [
@@ -73,8 +91,8 @@ class Organizer:
             ],
             'rowData': [
                 {
-                    'id': c.id, 
-                    'location': c.location, 
+                    'id': c.id,
+                    'location': c.location,
                     'description': c.description
                 } for c in self.get_containers()
             ]
@@ -86,15 +104,48 @@ class Organizer:
             containerid: str,
             name: str,
             description: str,
+            quantity: int,
             image: bytes
     ) -> None:
         si = StoredItem()
         si.containerid = int(containerid)
         si.name = name
         si.description = description
-        si.description = description
+        si.quantity = quantity
         si.image = image
         self._insert(si)
         return 0
+
+    def get_stored_items(self, limit: int = None, conditions: list = []) -> "list[Container]":
+        with self._db:
+            return self._db.get(StoredItem, limit, conditions)
+
+    def get_stored_items_grid(self, name: str = None, containerids: "list[int]" = None) -> dict:
+        # https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_filter_operators.htm
+        conditions = []
+        if name:
+            conditions.append(StoredItem.name.like(name + '%'))
+        if containerids:
+            print(containerids)
+            conditions.append(StoredItem.containerid.in_(containerids))
+
+        data = self.get_stored_items(None, conditions)  # type: list[StoredItem]
+
+        from nicegui import ui
+
+        return {
+            'columnDefs': [
+                {'headerName': 'Stored item', 'field': 'str'},
+                {'headerName': 'Description', 'field': 'description', }, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
+                # {'headerName': 'Image', 'field': 'image'},
+            ],
+            'rowData': [
+                {
+                    'str': f'[#{si.quantity}] {si.name}',
+                    'description': si.description,
+                    # 'image': 'ui.image()',
+                } for si in data
+            ]
+        }
 
     pass

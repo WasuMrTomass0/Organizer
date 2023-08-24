@@ -17,3 +17,17 @@ def is_str_empty(label: str, value: str) -> bool:
         msg = f"{value}" if value else 'empty string'
         ui.notify(f'{label} is invalid. Got {msg}')
     return ret
+
+
+def is_int_positive(label: str, value: int) -> bool:
+    try:
+        value = float(value)
+    except Exception:
+        ui.notify(f'{label} is invalid. Got "{str(value)}"')
+        return False
+
+    if value > 0:
+        ui.notify(f'{label} is invalid. Got {value}')
+        return False
+
+    return True

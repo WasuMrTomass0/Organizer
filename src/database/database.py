@@ -65,7 +65,7 @@ class Database:
         else:
             return self._insert_single(obj=obj)
 
-    def get(self, cls, limit: int = None, condition = None):
+    def get(self, cls, limit: int = None, conditions: list = None):
         """Get entry rows from
 
         Args:
@@ -77,8 +77,8 @@ class Database:
         query = self._session.query(cls)
         if limit:
             query = query.limit(limit)
-        if condition is not None:
-            query = query.where(condition)
+        if conditions:
+            query = query.where(*conditions)
         return query.all()
 
     def update(self, obj) -> None:

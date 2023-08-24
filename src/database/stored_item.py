@@ -13,6 +13,7 @@ class StoredItem(Base):
     containerid = sql.Column(sql.Integer, sql.ForeignKey(Container.id))
     name = sql.Column(sql.String)
     description = sql.Column(sql.Text)
+    quantity = sql.Column(sql.Integer)
     image = sql.Column(sql.BLOB)
     created = sql.Column(sql.TIMESTAMP, server_default=func.now())
     edited = sql.Column(sql.TIMESTAMP, onupdate=func.now())
@@ -21,5 +22,6 @@ class StoredItem(Base):
         return f'StoredItem: ' \
             f'id({self.id}), containerid({self.containerid}), ' \
             f'name({self.name}), description({self.description}), ' \
+            f'quantity({self.quantity}), ' \
             f'image({(len(self.image) if self.image else self.image)}), ' \
             f'created({self.created}), edited({self.edited})'

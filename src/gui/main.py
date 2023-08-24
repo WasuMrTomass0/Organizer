@@ -5,19 +5,17 @@ from nicegui import events
 
 from app.organizer import Organizer
 from gui.front_data import FrontData
-from gui.common import is_str_empty
+from gui.common import is_str_empty, is_int_positive
 
 
 #
 app = Organizer()
 fdata = FrontData()
 
-dialog = ui.dialog()
-
 
 def header():
     # Create header with menu and dark/light mode
-    header = ui.header(elevated=True)
+    header = ui.header(elevated=True, fixed=False)
     header.style('background-color: #3874c8')
     header.classes('items-center justify-between')
 
@@ -29,7 +27,8 @@ def header():
                 ui.separator()
                 ui.menu_item('Locations', lambda: ui.open(page_locations))
                 ui.menu_item('Containers', lambda: ui.open(page_containers))
-                ui.menu_item('Stored items', lambda: ui.open(page_stored_items))
+                ui.menu_item('Stored items - Create', lambda: ui.open(page_stored_items_create))
+                ui.menu_item('Stored items - Search', lambda: ui.open(page_stored_items_search))
         # Title
         ui.label('Organizer')
         # Dark/Light mode
@@ -37,11 +36,6 @@ def header():
         # light_mode dark_mode
         obj = ui.button(icon='light_mode', on_click=lambda: dark.toggle())
 
-    with dialog, ui.card():
-        ui.label('Processing!')
-        ui.spinner(size='lg')
-        ui.spinner('audio', size='lg', color='green')
-        ui.spinner('dots', size='lg', color='red')
     pass
 
 
@@ -49,10 +43,20 @@ def header():
 def page_home():
     header()
 
+    card_create = ui.card()
+    card_create.classes('w-full items-center')
+    card_create.style("max-width:1500px; min-width:250px;")
+    with card_create:
+        btn_csi = ui.button('Create stored item', on_click=lambda: None)
+        btn_csi.classes('w-full')
+
+        btn_ssi = ui.button('Search for stored item', on_click=lambda: None)
+        btn_ssi.classes('w-full')
+
 
 @ui.page('/locations')
 def page_locations():
-    # # # # # # # # 
+    # # # # # # # #
     def handler_create_location():
         # Read data
         name = fdata.get('location_name')
@@ -72,11 +76,11 @@ def page_locations():
             fdata.clear('location_name')
             ui.open(page_locations)
 
-    # # # # # # # # 
+    # # # # # # # #
     def handler_delete_location():
         pass
 
-    # # # # # # # # # # # # # # # # 
+    # # # # # # # # # # # # # # # #
     # Page layout
     header()
 
@@ -91,11 +95,11 @@ def page_locations():
             label='Name',
             on_change=lambda e: fdata.set('location_name', e.value)
         )
-        inp_name.classes('w-3/4')
+        inp_name.classes('w-full')
 
         btn_create = ui.button('Create', on_click=handler_create_location)
-        btn_create.classes('w-3/4')
-    
+        btn_create.classes('w-full')
+
     # List all locations
     card_list = ui.card()
     card_list.classes('w-full items-center')
@@ -106,10 +110,10 @@ def page_locations():
         grid = ui.aggrid(
             options=app.get_locations_grid()
         )
-        grid.classes('w-3/4')
+        grid.classes('w-full')
 
         btn_create = ui.button('Delete', on_click=handler_delete_location)
-        btn_create.classes('w-3/4')
+        btn_create.classes('w-full')
         btn_create.disable()
     pass
 
@@ -155,18 +159,18 @@ def page_containers():
         txt = ui.textarea(
             label='Description',
             on_change=lambda e: fdata.set('description', e.value))
-        txt.classes('w-3/4')
+        txt.classes('w-full')
 
         sel_location = ui.select(
             label='Location',
             with_input=True,
             on_change=lambda e: fdata.set('location', e.value),
             options=app.get_location_names())
-        sel_location.classes('w-3/4')
+        sel_location.classes('w-full')
 
         btn_create = ui.button('Create', on_click=lambda e: handler_create_container(e.sender))
-        btn_create.classes('w-3/4')
-    
+        btn_create.classes('w-full')
+
     # List all containers
     card_list = ui.card()
     card_list.classes('w-full items-center')
@@ -177,20 +181,21 @@ def page_containers():
         grid = ui.aggrid(
             options=app.get_containers_grid()
         )
-        grid.classes('w-3/4')
+        grid.classes('w-full')
 
         btn_create = ui.button('Delete')
-        btn_create.classes('w-3/4')
+        btn_create.classes('w-full')
         btn_create.disable()
     pass
 
 
-@ui.page('/stored_items')
-def page_stored_items():
+@ui.page('/stored_items/create')
+def page_stored_items_create():
     # Clear data
     fdata.clear('containerid')
     fdata.clear('name')
     fdata.clear('description')
+    fdata.set('quantity', 1)
     fdata.clear('image')
 
     def handler_upload(e: events.UploadEventArguments):
@@ -203,27 +208,37 @@ def page_stored_items():
         containerid = fdata.get('containerid')
         name = fdata.get('name')
         description = fdata.get('description')
+        quantity = fdata.get('quantity')
         image = fdata.get('image')
         # Check data
         err = any([
             is_str_empty('Container QR Code', containerid),
             is_str_empty('Name', name),
             is_str_empty('Description', description),
+            is_int_positive('Quantity', quantity),
         ])
-        if image is None:
-            err = True
-            ui.notify('Upload image')
+        # Image can be None
+        # if image is None:
+        #     err = True
+        #     ui.notify('Upload image')
 
         if err:
             return
 
-        app.add_stored_item(
-            containerid=containerid,
-            name=name,
-            description=description,
-            image=image,
-        )  
-        
+        try:
+            app.add_stored_item(
+                containerid=containerid,
+                name=name,
+                description=description,
+                quantity=quantity,
+                image=image,
+            )
+        except Exception as err:
+            ui.notify(str(err))
+            raise err
+
+        ui.open(page_stored_items_create)
+
         pass
 
     header()
@@ -232,43 +247,109 @@ def page_stored_items():
     card.classes('w-full items-center')
     card.style("max-width:1000px; min-width:250px;")
     with card:
+        # Title
         obj = ui.label('Create stored item')
+        # Containers
+        with ui.row().classes('w-full no-wrap'):
+            inp_container = ui.input(
+                label='QR code',
+                on_change=lambda e: fdata.set('containerid', e.value))
+            inp_container.classes('w-1/4')
 
-        inp_container = ui.input(
-            label='Container QR code',
-            on_change=lambda e: fdata.set('containerid', e.value))
-        inp_container.classes('w-3/4')
+            sel_location = ui.select(
+                label='Container',
+                with_input=True,
+                on_change=lambda e: fdata.set('containerid', e.value),
+                options=app.get_containers_select())
+            sel_location.classes('w-3/4')
 
+            # inp_container.bind_value(sel_location, 'value')
+            sel_location.bind_value(inp_container, 'value')
+        # Name
         inp_name = ui.input(
             label='Name',
             on_change=lambda e: fdata.set('name', e.value))
-        inp_name.classes('w-3/4')
-
+        inp_name.classes('w-full')
+        # Quantity
+        with ui.row().classes('w-full no-wrap'):
+            def update_quantity(delta: int) -> None:
+                x = fdata.get('quantity') + delta
+                if x > 0:
+                    fdata.set('quantity', x)
+                    inp_quantity.set_value(int(x))
+            #
+            btn_dec = ui.button(icon='remove_circle_outline', on_click=lambda: update_quantity(-1))
+            btn_inc = ui.button(icon='add_circle_outline', on_click=lambda: update_quantity(1))
+            #
+            inp_quantity = ui.number(label='Quantity', value=fdata.get('quantity'),
+            on_change=lambda e: fdata.set('quantity', e.value))
+            inp_quantity.classes('w-full')
+        # Description
         txt = ui.textarea(
             label='Description',
             on_change=lambda e: fdata.set('description', e.value))
-        txt.classes('w-3/4')
-
-        # sel_location = ui.select(
-        #     label='Location',
-        #     with_input=True,
-        #     on_change=lambda e: fdata.set('location', e.value),
-        #     options=app.get_location_names())
-        # sel_location.classes('w-3/4')
-
+        txt.classes('w-full')
+        # Image
         upl_img = ui.upload(
             label='Item image',
             auto_upload=True,
             max_files=1,
             on_upload=handler_upload)
         upl_img.props('accept=".png,.jpg,.jpeg"')
-        upl_img.classes('w-3/4')
-
-        btn_create = ui.button('Create', 
+        upl_img.classes('w-full')
+        # Creation
+        btn_create = ui.button('Create',
             on_click=handler_create_stored_item)
-        btn_create.classes('w-3/4')
+        btn_create.classes('w-full')
 
     pass
+
+
+@ui.page('/stored_items/search')
+def page_stored_items_search():
+    # Clear data
+    fdata.clear('containerids')
+    fdata.clear('name')
+
+    def handler_search():
+        sel_stored_items.call_api_method(
+            'setRowData',
+            app.get_stored_items_grid(
+                name=fdata.get('name'),
+                containerids=fdata.get('containerids'),
+            )['rowData']
+        )
+        pass
+
+    header()
+
+    card = ui.card()
+    card.classes('w-full items-center')
+    card.style("max-width:1000px; min-width:250px;")
+    with card:
+        # Title
+        obj = ui.label('Search for stored item')
+
+        # Containers to search in
+        sel_location = ui.select(
+            label='Container (leave empty to search in all)',
+            with_input=True,
+            multiple=True,
+            on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
+            options=app.get_containers_select())
+        sel_location.classes('w-full')
+
+        # Name
+        inp_name = ui.input(
+            label='Name',
+            on_change=lambda e: [fdata.set('name', e.value), handler_search()])
+        inp_name.classes('w-full')
+
+        # Search results
+        sel_stored_items = ui.aggrid(options=app.get_stored_items_grid())
+        sel_stored_items.on('cellClicked', lambda event: ui.notify(f'Cell value: {event.args["value"]}'))
+        inp_name.classes('w-full')
+        
 
 
 def main() -> None:
@@ -276,6 +357,6 @@ def main() -> None:
     ui.run(
         title='Organizer',
         favicon='🚀',
-        dark=True,
+        dark=None,
         viewport='width=device-width, initial-scale=1',
     )
