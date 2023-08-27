@@ -5,7 +5,7 @@ from nicegui import events
 
 from app.organizer import Organizer
 from gui.front_data import FrontData
-from gui.common import is_str_empty, is_int_positive
+from gui.common import is_str_empty, is_int_positive, image_to_base64, process_image
 
 
 #
@@ -52,6 +52,7 @@ def page_home():
 
         btn_ssi = ui.button('Search for stored item', on_click=lambda: None)
         btn_ssi.classes('w-full')
+
 
 
 @ui.page('/locations')
@@ -226,6 +227,13 @@ def page_stored_items_create():
             return
 
         try:
+            if image:
+                image = process_image(image)
+        except Exception as err:
+            ui.notify('Image error\n\n' + str(err))
+            raise err
+
+        try:
             app.add_stored_item(
                 containerid=containerid,
                 name=name,
@@ -321,7 +329,39 @@ def page_stored_items_search():
         )
         pass
 
+    def handler_show_image(event):
+        # Load sotred item
+        si = app.get_stored_item(id=event.args["data"]["id"])
+        # Set dialog widgets
+        dialog_label.set_text(
+            f'ID{si.id} [#{si.quantity}] {si.name}'
+        )
+        dial_show_si.open()
+        # Load image and update image object
+        if si.image is not None:
+            dialog_image.set_source(image_to_base64(si.image))
+        else:
+            with open('data/no_photo.jpg', 'rb') as f:
+                dialog_image.set_source(image_to_base64(f.read()))
+        pass
+
     header()
+
+    # Dialog
+    dial_show_si = ui.dialog(value=False)
+    dial_show_si.classes('w-full')
+    with dial_show_si, ui.card().classes('w-full'):
+        dialog_label = ui.label('Image content:')
+        #
+        dialog_image = ui.image('data/no_photo.jpg')
+        #
+        dialog_btn_edit = ui.button('Edit')
+        dialog_btn_edit.classes('w-full')
+        dialog_btn_edit.disable()
+        #
+        dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
+        dialog_btn_close.classes('w-full')
+
 
     card = ui.card()
     card.classes('w-full items-center')
@@ -347,13 +387,14 @@ def page_stored_items_search():
 
         # Search results
         sel_stored_items = ui.aggrid(options=app.get_stored_items_grid())
-        sel_stored_items.on('cellClicked', lambda event: ui.notify(f'Cell value: {event.args["value"]}'))
+        sel_stored_items.on('cellClicked', lambda event: handler_show_image(event))
         inp_name.classes('w-full')
-        
+
 
 
 def main() -> None:
     header()
+    ui.open(page_home)
     ui.run(
         title='Organizer',
         favicon='🚀',

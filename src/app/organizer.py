@@ -116,7 +116,11 @@ class Organizer:
         self._insert(si)
         return 0
 
-    def get_stored_items(self, limit: int = None, conditions: list = []) -> "list[Container]":
+    def get_stored_item(self, id: int) -> StoredItem:
+        conditions = [ StoredItem.id == id ]
+        return self.get_stored_items(None, conditions)[0]
+
+    def get_stored_items(self, limit: int = None, conditions: list = []) -> "list[StoredItem]":
         with self._db:
             return self._db.get(StoredItem, limit, conditions)
 
@@ -124,26 +128,22 @@ class Organizer:
         # https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_filter_operators.htm
         conditions = []
         if name:
-            conditions.append(StoredItem.name.like(name + '%'))
+            conditions.append(StoredItem.name.like('%' + name + '%'))
         if containerids:
-            print(containerids)
             conditions.append(StoredItem.containerid.in_(containerids))
 
         data = self.get_stored_items(None, conditions)  # type: list[StoredItem]
-
-        from nicegui import ui
 
         return {
             'columnDefs': [
                 {'headerName': 'Stored item', 'field': 'str'},
                 {'headerName': 'Description', 'field': 'description', }, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
-                # {'headerName': 'Image', 'field': 'image'},
             ],
             'rowData': [
                 {
+                    'id': si.id,
                     'str': f'[#{si.quantity}] {si.name}',
                     'description': si.description,
-                    # 'image': 'ui.image()',
                 } for si in data
             ]
         }

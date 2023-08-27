@@ -1,5 +1,9 @@
 from nicegui import ui
 from contextlib import contextmanager
+from PIL import Image
+import base64
+from PIL import Image
+from io import BytesIO
 
 
 @contextmanager
@@ -31,3 +35,25 @@ def is_int_positive(label: str, value: int) -> bool:
         return False
 
     return True
+
+
+# Prepare image for storage in database
+def process_image(image: bytes, dim: tuple = (1024,1024), preserve_ratio: bool = True) -> bytes:
+    # Create Image object from bytes
+    img = Image.open(BytesIO(image))
+    # Resize image
+    if preserve_ratio:
+        img.thumbnail(dim)
+    else:
+        img = img.resize(dim)
+    # Convert to RGB format
+    img = img.convert("RGB")
+    # Convert to JPEG format
+    bytes_o = BytesIO()
+    img.save(bytes_o, 'jpeg')
+    return bytes_o.getvalue()
+
+
+# max_dim: list = None
+def image_to_base64(image: bytes) -> str:
+    return f'data:image/jpeg;base64,{base64.b64encode(image).decode("ascii")}'
