@@ -116,6 +116,14 @@ class Organizer:
         self._insert(si)
         return 0
 
+    def remove_stored_item(self, id: int) -> None:
+        self._db.remove(
+            cls=StoredItem,
+            conditions=[
+                StoredItem.id == id
+            ]
+        )
+
     def get_stored_item(self, id: int) -> StoredItem:
         conditions = [ StoredItem.id == id ]
         return self.get_stored_items(None, conditions)[0]
@@ -136,14 +144,14 @@ class Organizer:
 
         return {
             'columnDefs': [
-                {'headerName': 'Stored item', 'field': 'str'},
-                {'headerName': 'Description', 'field': 'description', }, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
+                {'headerName': 'Stored item', 'field': 'str', 'resizable': True},
+                {'headerName': 'Description', 'field': 'description', 'resizable': True}, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
             ],
             'rowData': [
                 {
                     'id': si.id,
-                    'str': f'[#{si.quantity}] {si.name}',
-                    'description': si.description,
+                    'str': si.name,
+                    'description': f'[#{si.quantity}] {si.description}',
                 } for si in data
             ]
         }

@@ -23,6 +23,9 @@ class Database:
     def __exit__(self, *args):
         self._close_session()
 
+    def _commit(self) -> None:
+        self._session.commit()
+
     def _open_session(self) -> None:
         self._session = self._SessionClass()
 
@@ -32,14 +35,21 @@ class Database:
     def _insert_single(self, obj) -> None:
         query = self._session.query(obj.__class__)
         self._session.add(obj)
-        self._session.commit()
+        self._commit()
 
     def _insert_many(self, objs) -> None:
         obj = objs[0]
         query = self._session.query(obj.__class__)
         for obj in objs:
             self._session.add(obj)
-        self._session.commit()
+        self._commit()
+
+    def _remove_single(self, cls, condition) -> None:
+        self._session.query(cls).filter(condition).delete()
+        self._commit()
+
+    def _insert_many(self, objs) -> None:
+        raise NotImplementedError()
 
     def is_table(self, cls: str) -> bool:
         """Check if table exists
@@ -64,6 +74,16 @@ class Database:
             return self._insert_many(objs=obj)
         else:
             return self._insert_single(obj=obj)
+
+    def remove(self, cls, conditions: list) -> None:
+        """Remove entries from table
+
+        Args:
+            cls (class): Entry data type
+            conditions (list): Conditions used to match entries
+        """
+        for con in conditions:
+            return self._remove_single(cls=cls, condition=con)
 
     def get(self, cls, limit: int = None, conditions: list = None):
         """Get entry rows from
@@ -90,7 +110,7 @@ class Database:
         condition = obj.__class__ == obj.id
         data = self.get(obj.__class__, condition)
         data[0] = obj
-        self._session.commit()
+        self._commit()
 
 
 # db = Database()

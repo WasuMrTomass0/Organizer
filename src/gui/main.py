@@ -5,8 +5,7 @@ from nicegui import events
 
 from app.organizer import Organizer
 from gui.front_data import FrontData
-from gui.common import is_str_empty, is_int_positive, image_to_base64, process_image
-
+import gui.common as cmn
 
 #
 app = Organizer()
@@ -213,10 +212,10 @@ def page_stored_items_create():
         image = fdata.get('image')
         # Check data
         err = any([
-            is_str_empty('Container QR Code', containerid),
-            is_str_empty('Name', name),
-            is_str_empty('Description', description),
-            is_int_positive('Quantity', quantity),
+            cmn.is_str_empty('Container QR Code', containerid),
+            cmn.is_str_empty('Name', name),
+            # cmn.is_str_empty('Description', description),
+            cmn.is_int_positive('Quantity', quantity),
         ])
         # Image can be None
         # if image is None:
@@ -228,7 +227,7 @@ def page_stored_items_create():
 
         try:
             if image:
-                image = process_image(image)
+                image = cmn.process_image(image)
         except Exception as err:
             ui.notify('Image error\n\n' + str(err))
             raise err
@@ -318,6 +317,7 @@ def page_stored_items_search():
     # Clear data
     fdata.clear('containerids')
     fdata.clear('name')
+    fdata.clear('delete_id')
 
     def handler_search():
         sel_stored_items.call_api_method(
@@ -332,32 +332,56 @@ def page_stored_items_search():
     def handler_show_image(event):
         # Load sotred item
         si = app.get_stored_item(id=event.args["data"]["id"])
+        # Set selected id
+        fdata.set('delete_id', si.id)
         # Set dialog widgets
         dialog_label.set_text(
             f'ID{si.id} [#{si.quantity}] {si.name}'
         )
+        dialog_label_dsc.set_text(si.description)
         dial_show_si.open()
         # Load image and update image object
         if si.image is not None:
-            dialog_image.set_source(image_to_base64(si.image))
+            dialog_image.set_source(cmn.image_to_base64(si.image))
         else:
             with open('data/no_photo.jpg', 'rb') as f:
-                dialog_image.set_source(image_to_base64(f.read()))
+                dialog_image.set_source(cmn.image_to_base64(f.read()))
         pass
+
+    async def handler_delete():
+        dialog_yes_no.open()
+        yes = await dialog_yes_no
+        if yes:
+            try:
+                app.remove_stored_item(id=fdata.get('delete_id'))
+            except Exception as err:
+                ui.notify(str(err))
+                raise err
+            else:
+                ui.open(page_stored_items_search)
 
     header()
 
-    # Dialog
+    # Dialog - yes no
+    dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+
+    # Dialog - show image
     dial_show_si = ui.dialog(value=False)
     dial_show_si.classes('w-full')
     with dial_show_si, ui.card().classes('w-full'):
         dialog_label = ui.label('Image content:')
+        with ui.card().classes('w-full'):
+            dialog_label_dsc = ui.label('Description')
         #
         dialog_image = ui.image('data/no_photo.jpg')
         #
-        dialog_btn_edit = ui.button('Edit')
-        dialog_btn_edit.classes('w-full')
-        dialog_btn_edit.disable()
+        with ui.row().classes('w-full no-wrap'):
+            dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete)
+            dialog_btn_edit.classes('w-1/2')
+            #
+            dialog_btn_edit = ui.button('Edit')
+            dialog_btn_edit.classes('w-1/2')
+            dialog_btn_edit.disable()
         #
         dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
         dialog_btn_close.classes('w-full')
