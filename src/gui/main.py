@@ -83,7 +83,12 @@ def page_locations():
             ui.open(page_locations)
 
     # # # # # # # #
-    def handler_delete_location():
+    async def handler_delete_location():
+        dialog_yes_no.open()
+        yes = await dialog_yes_no
+        if not yes:
+            return
+        
         name = fdata.get('selected_location_name')
         if name is None:
             ui.notify(f'Select location to delete')
@@ -105,6 +110,9 @@ def page_locations():
     # # # # # # # # # # # # # # # #
     # Page layout
     header()
+
+    # Dialog - yes no
+    dialog_yes_no = cmn.create_dialog_yes_no(label=None)
 
     # Create new location
     card_create = ui.card()
