@@ -5,3 +5,5 @@ ignored
 venv
 # Drawio temp files
 doc/.$*
+# Log files
+*.log
