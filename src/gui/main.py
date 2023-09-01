@@ -186,7 +186,9 @@ def page_containers():
         # Set selected id
         fdata.set('selected_container_id', cnt.id)
         # Update labels
-        dialog_label_id.set_text('ID: ' + str(cnt.id))
+        count = len(app.get_stored_items_in_container(containerid=cnt.id))
+        label = f'ID: {str(cnt.id)}, Items: {count}'
+        dialog_label_id.set_text(label)
         dialog_label_loc.set_text('Location: ' + str(cnt.location))
         dialog_label_dsc.set_text('Description: ' + str(cnt.description))
         # Show dialog

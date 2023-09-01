@@ -144,6 +144,10 @@ class Organizer:
         with self._db:
             return self._db.get(StoredItem, limit, conditions)
 
+    def get_stored_items_in_container(self, containerid: id) -> "list[StoredItem]":
+        conditions = [StoredItem.containerid == containerid]
+        return self.get_stored_items(conditions=conditions)
+
     def get_stored_items_grid(self, name: str = None, containerids: "list[int]" = None) -> dict:
         # https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_orm_filter_operators.htm
         conditions = []
