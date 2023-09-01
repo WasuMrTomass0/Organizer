@@ -28,11 +28,18 @@ class Organizer:
     def add_location(
             self,
             name: str = None,
-        ) -> int:
+        ) -> None:
         loc = Location()
         loc.name = name
         self._insert(loc)
-        return 0
+
+    def remove_location(self, name: str) -> None:
+        self._db.remove(
+            cls=Location,
+            conditions=[
+                Location.name == name
+            ]
+        )
 
     def get_locations(self) -> "list[Location]":
         with self._db:
@@ -56,12 +63,11 @@ class Organizer:
             self,
             location: str = None,
             description: str = None,
-        ) -> int:
+        ) -> None:
         c = Container()
         c.location = location
         c.description = description
         self._insert(c)
-        return 0
 
     def get_containers(self) -> "list[Container]":
         with self._db:
@@ -107,7 +113,7 @@ class Organizer:
             description: str,
             quantity: int,
             image: bytes
-    ) -> None:
+        ) -> None:
         si = StoredItem()
         si.containerid = int(containerid)
         si.name = name
@@ -115,7 +121,6 @@ class Organizer:
         si.quantity = quantity
         si.image = image
         self._insert(si)
-        return 0
 
     def remove_stored_item(self, id: int) -> None:
         self._db.remove(

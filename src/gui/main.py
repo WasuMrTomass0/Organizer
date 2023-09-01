@@ -1,9 +1,13 @@
+from logging import ERROR
+
+import pymysql
 from nicegui import ui
 from nicegui import events
 
 from app.organizer import Organizer
 from gui.front_data import FrontData
 import gui.common as cmn
+from logger import log
 
 
 # Global variables
@@ -56,29 +60,47 @@ def page_home():
 
 @ui.page('/locations')
 def page_locations():
+    # Clear data on entry
+    fdata.clear('location_name')
+    fdata.clear('selected_location_name')
+
     # # # # # # # #
     def handler_create_location():
         # Read data
         name = fdata.get('location_name')
         # Check data
-        if name is None or name == '':
-            msg = f"{name}" if name else 'empty string'
-            ui.notify(f'Name is invalid. Got {msg}')
+        if cmn.is_str_empty('Location\'s name', name):
             return
-        # Process data
-        code = app.add_location(
-            name=name
-        )
-        # Notify user
-        if code:
-            ui.notify(f'Error during creation of location')
+        try:
+            app.add_location(
+                name=name
+            )
+        except Exception as err:
+            msg = 'Error during creation of location'
+            ui.notify(msg)
+            log(ERROR, f'{msg} Error: {str(err)}')
         else:
-            fdata.clear('location_name')
             ui.open(page_locations)
 
     # # # # # # # #
     def handler_delete_location():
-        pass
+        name = fdata.get('selected_location_name')
+        if name is None:
+            ui.notify(f'Select location to delete')
+            return
+        try:
+            app.remove_location(name)
+        except pymysql.err.IntegrityError as err:
+            msg = 'Can\'t remove location that is used by containers'
+            ui.notify(msg)
+            log(ERROR, f'{msg} Error: {str(err)}')
+
+        except Exception as err:
+            msg = 'Error during deletion of location'
+            ui.notify(msg)
+            log(ERROR, f'{msg} Error: {str(err)}')
+        else:
+            ui.open(page_locations)
 
     # # # # # # # # # # # # # # # #
     # Page layout
@@ -111,10 +133,10 @@ def page_locations():
             options=app.get_locations_grid()
         )
         grid.classes('w-full')
+        grid.on('cellClicked', lambda event: fdata.set('selected_location_name', event.args["data"]["name"]))
 
         btn_create = ui.button('Delete', on_click=handler_delete_location)
         btn_create.classes('w-full')
-        btn_create.disable()
     pass
 
 
@@ -359,7 +381,7 @@ def page_stored_items_search():
                 raise err
             else:
                 ui.open(page_stored_items_search)
-    
+
     def handler_item_take_out():
         try:
             app.add_item_in_use(id=fdata.get('selected_item_id'))
