@@ -49,14 +49,15 @@ def header():
 def page_home():
     header()
 
-    card_create = ui.card()
-    card_create.classes('w-full items-center')
-    card_create.style("max-width:1000px; min-width:250px;")
-    with card_create:
-        ui.button('Item Create', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
-        ui.button('Item Search', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
-        ui.button('Location', on_click=lambda: ui.open(page_locations)).classes('w-full')
-        ui.button('Container', on_click=lambda: ui.open(page_containers)).classes('w-full')
+    with ui.column().classes('w-full items-center'):
+        card_create = ui.card()
+        card_create.classes('w-full items-center')
+        card_create.style("max-width:1000px; min-width:250px;")
+        with card_create:
+            ui.button('Item Create', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
+            ui.button('Item Search', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
+            ui.button('Location', on_click=lambda: ui.open(page_locations)).classes('w-full')
+            ui.button('Container', on_click=lambda: ui.open(page_containers)).classes('w-full')
 
 
 @ui.page('/locations')
@@ -112,40 +113,41 @@ def page_locations():
     # Page layout
     header()
 
-    # Dialog - yes no
-    dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+    with ui.column().classes('w-full items-center'):
+        # Dialog - yes no
+        dialog_yes_no = cmn.create_dialog_yes_no(label=None)
 
-    # Create new location
-    card_create = ui.card()
-    card_create.classes('w-full items-center')
-    card_create.style("max-width:1000px; min-width:250px;")
-    with card_create:
-        obj = ui.label('Create location')
+        # Create new location
+        card_create = ui.card()
+        card_create.classes('w-full items-center')
+        card_create.style("max-width:1000px; min-width:250px;")
+        with card_create:
+            obj = ui.label('Create location')
 
-        inp_name = ui.input(
-            label='Name',
-            on_change=lambda e: fdata.set('location_name', e.value)
-        )
-        inp_name.classes('w-full')
+            inp_name = ui.input(
+                label='Name',
+                on_change=lambda e: fdata.set('location_name', e.value)
+            )
+            inp_name.classes('w-full')
 
-        btn_create = ui.button('Create', on_click=handler_create_location)
-        btn_create.classes('w-full')
+            btn_create = ui.button('Create', on_click=handler_create_location)
+            btn_create.classes('w-full')
 
-    # List all locations
-    card_list = ui.card()
-    card_list.classes('w-full items-center')
-    card_list.style("max-width:1000px; min-width:250px;")
-    with card_list:
-        obj = ui.label(f'Existing locations {len(app.get_location_names())}')
+        # List all locations
+        card_list = ui.card()
+        card_list.classes('w-full items-center')
+        card_list.style("max-width:1000px; min-width:250px;")
+        with card_list:
+            obj = ui.label(f'Existing locations {len(app.get_location_names())}')
 
-        grid = ui.aggrid(
-            options=app.get_locations_grid()
-        )
-        grid.classes('w-full')
-        grid.on('cellClicked', lambda event: fdata.set('selected_location_name', event.args["data"]["name"]))
+            grid = ui.aggrid(
+                options=app.get_locations_grid()
+            )
+            grid.classes('w-full')
+            grid.on('cellClicked', lambda event: fdata.set('selected_location_name', event.args["data"]["name"]))
 
-        btn_create = ui.button('Delete', on_click=handler_delete_location)
-        btn_create.classes('w-full')
+            btn_create = ui.button('Delete', on_click=handler_delete_location)
+            btn_create.classes('w-full')
     pass
 
 
@@ -224,55 +226,56 @@ def page_containers():
     # Page layout
     header()
 
-    # Dialog - yes no
-    dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+    with ui.column().classes('w-full items-center'):
+        # Dialog - yes no
+        dialog_yes_no = cmn.create_dialog_yes_no(label=None)
 
-    # Dialog - show container
-    dial_show_c = ui.dialog(value=False)
-    dial_show_c.classes('w-full')
-    with dial_show_c, ui.card().classes('w-full'):
-        dialog_label_id = ui.label('Container info:')
-        dialog_label_loc = ui.label('Container info:')
-        dialog_label_dsc = ui.label('Description')
-        #
-        with ui.row().classes('w-full no-wrap'):
-            dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete_container)
-            dialog_btn_edit.classes('w-1/2')
+        # Dialog - show container
+        dial_show_c = ui.dialog(value=False)
+        dial_show_c.classes('w-full')
+        with dial_show_c, ui.card().classes('w-full'):
+            dialog_label_id = ui.label('Container info:')
+            dialog_label_loc = ui.label('Container info:')
+            dialog_label_dsc = ui.label('Description')
             #
-            dialog_btn_close = ui.button('Close', on_click=dial_show_c.close)
-            dialog_btn_close.classes('w-1/2')
+            with ui.row().classes('w-full no-wrap'):
+                dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete_container)
+                dialog_btn_edit.classes('w-1/2')
+                #
+                dialog_btn_close = ui.button('Close', on_click=dial_show_c.close)
+                dialog_btn_close.classes('w-1/2')
 
-    card = ui.card()
-    card.classes('w-full items-center')
-    card.style("max-width:1000px; min-width:250px;")
-    with card:
-        obj = ui.label('Create container')
+        card = ui.card()
+        card.classes('w-full items-center')
+        card.style("max-width:1000px; min-width:250px;")
+        with card:
+            obj = ui.label('Create container')
 
-        txt = ui.textarea(
-            label='Description',
-            on_change=lambda e: fdata.set('description', e.value))
-        txt.classes('w-full')
+            txt = ui.textarea(
+                label='Description',
+                on_change=lambda e: fdata.set('description', e.value))
+            txt.classes('w-full')
 
-        sel_location = ui.select(
-            label='Location',
-            with_input=True,
-            on_change=lambda e: fdata.set('location', e.value),
-            options=app.get_location_names())
-        sel_location.classes('w-full')
+            sel_location = ui.select(
+                label='Location',
+                with_input=True,
+                on_change=lambda e: fdata.set('location', e.value),
+                options=app.get_location_names())
+            sel_location.classes('w-full')
 
-        btn_create = ui.button('Create', on_click=lambda e: handler_create_container(e.sender))
-        btn_create.classes('w-full')
+            btn_create = ui.button('Create', on_click=lambda e: handler_create_container(e.sender))
+            btn_create.classes('w-full')
 
-    # List all containers
-    card_list = ui.card()
-    card_list.classes('w-full items-center')
-    card_list.style("max-width:1000px; min-width:250px;")
-    with card_list:
-        obj = ui.label(f'Existing containers {len(app.get_containers())}')
+        # List all containers
+        card_list = ui.card()
+        card_list.classes('w-full items-center')
+        card_list.style("max-width:1000px; min-width:250px;")
+        with card_list:
+            obj = ui.label(f'Existing containers {len(app.get_containers())}')
 
-        grid = ui.aggrid(options=app.get_containers_grid())
-        grid.on('cellClicked', lambda event: handler_show_container(event))
-        grid.classes('w-full')
+            grid = ui.aggrid(options=app.get_containers_grid())
+            grid.on('cellClicked', lambda event: handler_show_container(event))
+            grid.classes('w-full')
     pass
 
 
@@ -337,64 +340,66 @@ def page_stored_items_create():
 
     header()
 
-    card = ui.card()
-    card.classes('w-full items-center')
-    card.style("max-width:1000px; min-width:250px;")
-    with card:
-        # Title
-        obj = ui.label('Create stored item')
-        # Containers
-        with ui.row().classes('w-full no-wrap'):
-            inp_container = ui.input(
-                label='QR code',
-                on_change=lambda e: fdata.set('containerid', e.value))
-            inp_container.classes('w-1/4')
 
-            sel_location = ui.select(
-                label='Container',
-                with_input=True,
-                on_change=lambda e: fdata.set('containerid', e.value),
-                options=app.get_containers_select())
-            sel_location.classes('w-3/4')
+    with ui.column().classes('w-full items-center'):
+        card = ui.card()
+        card.classes('w-full items-center')
+        card.style("max-width:1000px; min-width:250px;")
+        with card:
+            # Title
+            obj = ui.label('Create stored item')
+            # Containers
+            with ui.row().classes('w-full no-wrap'):
+                inp_container = ui.input(
+                    label='QR code',
+                    on_change=lambda e: fdata.set('containerid', e.value))
+                inp_container.classes('w-1/4')
 
-            # inp_container.bind_value(sel_location, 'value')
-            sel_location.bind_value(inp_container, 'value')
-        # Name
-        inp_name = ui.input(
-            label='Name',
-            on_change=lambda e: fdata.set('name', e.value))
-        inp_name.classes('w-full')
-        # Quantity
-        with ui.row().classes('w-full no-wrap'):
-            def update_quantity(delta: int) -> None:
-                x = fdata.get('quantity') + delta
-                if x > 0:
-                    fdata.set('quantity', x)
-                    inp_quantity.set_value(int(x))
-            #
-            btn_dec = ui.button(icon='remove_circle_outline', on_click=lambda: update_quantity(-1))
-            btn_inc = ui.button(icon='add_circle_outline', on_click=lambda: update_quantity(1))
-            #
-            inp_quantity = ui.number(label='Quantity', value=fdata.get('quantity'),
-            on_change=lambda e: fdata.set('quantity', e.value))
-            inp_quantity.classes('w-full')
-        # Description
-        txt = ui.textarea(
-            label='Description',
-            on_change=lambda e: fdata.set('description', e.value))
-        txt.classes('w-full')
-        # Image
-        upl_img = ui.upload(
-            label='Item image',
-            auto_upload=True,
-            max_files=1,
-            on_upload=handler_upload)
-        upl_img.props('accept=".png,.jpg,.jpeg"')
-        upl_img.classes('w-full')
-        # Creation
-        btn_create = ui.button('Create',
-            on_click=handler_create_stored_item)
-        btn_create.classes('w-full')
+                sel_location = ui.select(
+                    label='Container',
+                    with_input=True,
+                    on_change=lambda e: fdata.set('containerid', e.value),
+                    options=app.get_containers_select())
+                sel_location.classes('w-3/4')
+
+                # inp_container.bind_value(sel_location, 'value')
+                sel_location.bind_value(inp_container, 'value')
+            # Name
+            inp_name = ui.input(
+                label='Name',
+                on_change=lambda e: fdata.set('name', e.value))
+            inp_name.classes('w-full')
+            # Quantity
+            with ui.row().classes('w-full no-wrap'):
+                def update_quantity(delta: int) -> None:
+                    x = fdata.get('quantity') + delta
+                    if x > 0:
+                        fdata.set('quantity', x)
+                        inp_quantity.set_value(int(x))
+                #
+                btn_dec = ui.button(icon='remove_circle_outline', on_click=lambda: update_quantity(-1))
+                btn_inc = ui.button(icon='add_circle_outline', on_click=lambda: update_quantity(1))
+                #
+                inp_quantity = ui.number(label='Quantity', value=fdata.get('quantity'),
+                on_change=lambda e: fdata.set('quantity', e.value))
+                inp_quantity.classes('w-full')
+            # Description
+            txt = ui.textarea(
+                label='Description',
+                on_change=lambda e: fdata.set('description', e.value))
+            txt.classes('w-full')
+            # Image
+            upl_img = ui.upload(
+                label='Item image',
+                auto_upload=True,
+                max_files=1,
+                on_upload=handler_upload)
+            upl_img.props('accept=".png,.jpg,.jpeg"')
+            upl_img.classes('w-full')
+            # Creation
+            btn_create = ui.button('Create',
+                on_click=handler_create_stored_item)
+            btn_create.classes('w-full')
 
     pass
 
@@ -458,61 +463,61 @@ def page_stored_items_search():
 
     header()
 
-    # Dialog - yes no
-    dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+    with ui.column().classes('w-full items-center'):
+        # Dialog - yes no
+        dialog_yes_no = cmn.create_dialog_yes_no(label=None)
 
-    # Dialog - show image
-    dial_show_si = ui.dialog(value=False)
-    dial_show_si.classes('w-full')
-    with dial_show_si, ui.card().classes('w-full'):
-        dialog_label = ui.label('Image content:')
-        with ui.card().classes('w-full'):
-            dialog_label_dsc = ui.label('Description')
-        #
-        dialog_image = ui.image('data/no_photo.jpg')
-        #
-        with ui.row().classes('w-full no-wrap'):
-            dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete)
-            dialog_btn_edit.classes('w-1/2')
+        # Dialog - show image
+        dial_show_si = ui.dialog(value=False)
+        dial_show_si.classes('w-full')
+        with dial_show_si, ui.card().classes('w-full'):
+            dialog_label = ui.label('Image content:')
+            with ui.card().classes('w-full'):
+                dialog_label_dsc = ui.label('Description')
             #
-            dialog_btn_edit = ui.button('Edit')
-            dialog_btn_edit.classes('w-1/2')
-            dialog_btn_edit.disable()
-        #
-        with ui.row().classes('w-full no-wrap'):
-            dialog_btn_take_out = ui.button('Take out', on_click=handler_item_take_out)
-            dialog_btn_take_out.classes('w-1/2')
+            dialog_image = ui.image('data/no_photo.jpg')
             #
-            dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
-            dialog_btn_close.classes('w-1/2')
+            with ui.row().classes('w-full no-wrap'):
+                dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete)
+                dialog_btn_edit.classes('w-1/2')
+                #
+                dialog_btn_edit = ui.button('Edit')
+                dialog_btn_edit.classes('w-1/2')
+                dialog_btn_edit.disable()
+            #
+            with ui.row().classes('w-full no-wrap'):
+                dialog_btn_take_out = ui.button('Take out', on_click=handler_item_take_out)
+                dialog_btn_take_out.classes('w-1/2')
+                #
+                dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
+                dialog_btn_close.classes('w-1/2')
 
-    card = ui.card()
-    card.classes('w-full items-center')
-    card.style("max-width:1000px; min-width:250px;")
-    with card:
-        # Title
-        obj = ui.label('Search for stored item')
+        card = ui.card()
+        card.classes('w-full items-center')
+        card.style("max-width:1000px; min-width:250px;")
+        with card:
+            # Title
+            obj = ui.label('Search for stored item')
 
-        # Containers to search in
-        sel_location = ui.select(
-            label='Container (leave empty to search in all)',
-            with_input=True,
-            multiple=True,
-            on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
-            options=app.get_containers_select())
-        sel_location.classes('w-full')
+            # Containers to search in
+            sel_location = ui.select(
+                label='Container (leave empty to search in all)',
+                with_input=True,
+                multiple=True,
+                on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
+                options=app.get_containers_select())
+            sel_location.classes('w-full')
 
-        # Name
-        inp_name = ui.input(
-            label='Name',
-            on_change=lambda e: [fdata.set('name', e.value), handler_search()])
-        inp_name.classes('w-full')
+            # Name
+            inp_name = ui.input(
+                label='Name',
+                on_change=lambda e: [fdata.set('name', e.value), handler_search()])
+            inp_name.classes('w-full')
 
-        # Search results
-        sel_stored_items = ui.aggrid(options=app.get_stored_items_grid())
-        sel_stored_items.on('cellClicked', lambda event: handler_show_image(event))
-        inp_name.classes('w-full')
-
+            # Search results
+            sel_stored_items = ui.aggrid(options=app.get_stored_items_grid())
+            sel_stored_items.on('cellClicked', lambda event: handler_show_image(event))
+            inp_name.classes('w-full')
 
 
 def main() -> None:
