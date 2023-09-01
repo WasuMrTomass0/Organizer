@@ -51,14 +51,12 @@ def page_home():
 
     card_create = ui.card()
     card_create.classes('w-full items-center')
-    card_create.style("max-width:1500px; min-width:250px;")
+    card_create.style("max-width:1000px; min-width:250px;")
     with card_create:
-        btn_csi = ui.button('Create stored item', on_click=lambda: None)
-        btn_csi.classes('w-full')
-
-        btn_ssi = ui.button('Search for stored item', on_click=lambda: None)
-        btn_ssi.classes('w-full')
-
+        ui.button('Item Create', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
+        ui.button('Item Search', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
+        ui.button('Location', on_click=lambda: ui.open(page_locations)).classes('w-full')
+        ui.button('Container', on_click=lambda: ui.open(page_containers)).classes('w-full')
 
 
 @ui.page('/locations')
