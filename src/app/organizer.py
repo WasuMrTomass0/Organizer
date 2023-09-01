@@ -36,9 +36,7 @@ class Organizer:
     def remove_location(self, name: str) -> None:
         self._db.remove(
             cls=Location,
-            conditions=[
-                Location.name == name
-            ]
+            conditions=[Location.name == name]
         )
 
     def get_locations(self) -> "list[Location]":
@@ -69,9 +67,19 @@ class Organizer:
         c.description = description
         self._insert(c)
 
-    def get_containers(self) -> "list[Container]":
+    def remove_container(self, id: int) -> None:
+        self._db.remove(
+            cls=Container,
+            conditions=[Container.id == id]
+        )
+
+    def get_containers(self, limit: int = None, conditions: list = None) -> "list[Container]":
         with self._db:
-            return self._db.get(Container)
+            return self._db.get(Container, limit=limit, conditions=conditions)
+
+    def get_container(self, id: int) -> "Container":
+        conditions = [ Container.id == id ]
+        return self.get_containers(None, conditions)[0]
 
     def get_containers_select(self) -> "dict[int, str]":
         """Returns dict made of containers for select.
@@ -125,16 +133,14 @@ class Organizer:
     def remove_stored_item(self, id: int) -> None:
         self._db.remove(
             cls=StoredItem,
-            conditions=[
-                StoredItem.id == id
-            ]
+            conditions=[StoredItem.id == id]
         )
 
     def get_stored_item(self, id: int) -> StoredItem:
         conditions = [ StoredItem.id == id ]
         return self.get_stored_items(None, conditions)[0]
 
-    def get_stored_items(self, limit: int = None, conditions: list = []) -> "list[StoredItem]":
+    def get_stored_items(self, limit: int = None, conditions: list = None) -> "list[StoredItem]":
         with self._db:
             return self._db.get(StoredItem, limit, conditions)
 

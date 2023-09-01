@@ -1,6 +1,6 @@
 from logging import ERROR
 
-import pymysql
+import sqlalchemy
 from nicegui import ui
 from nicegui import events
 
@@ -88,14 +88,14 @@ def page_locations():
         yes = await dialog_yes_no
         if not yes:
             return
-        
+
         name = fdata.get('selected_location_name')
         if name is None:
             ui.notify(f'Select location to delete')
             return
         try:
             app.remove_location(name)
-        except pymysql.err.IntegrityError as err:
+        except sqlalchemy.exc.IntegrityError as err:
             msg = 'Can\'t remove location that is used by containers'
             ui.notify(msg)
             log(ERROR, f'{msg} Error: {str(err)}')
@@ -150,6 +150,11 @@ def page_locations():
 
 @ui.page('/containers')
 def page_containers():
+    # Clear data
+    fdata.clear('location')
+    fdata.clear('description')
+    fdata.clear('selected_container_id')
+
     # handler_create_container
     def handler_create_container(button: ui.button):
         # Read data
@@ -173,12 +178,66 @@ def page_containers():
         if code:
             ui.notify(f'Error during creation of container')
         else:
-            fdata.clear('location')
-            fdata.clear('description')
             ui.open(page_containers)
+
+    def handler_show_container(event):
+        # Load container
+        cnt = app.get_container(id=event.args["data"]["id"])
+        # Set selected id
+        fdata.set('selected_container_id', cnt.id)
+        # Update labels
+        dialog_label_id.set_text('ID: ' + str(cnt.id))
+        dialog_label_loc.set_text('Location: ' + str(cnt.location))
+        dialog_label_dsc.set_text('Description: ' + str(cnt.description))
+        # Show dialog
+        dial_show_c.open()
+
+    async def handler_delete_container():
+        # Confirm choice
+        dialog_yes_no.open()
+        yes = await dialog_yes_no
+        if not yes:
+            return
+        # Delete container
+        id = fdata.get('selected_container_id')
+        if id is None:
+            ui.notify(f'Select container to delete')
+            return
+        try:
+            app.remove_container(id)
+        except sqlalchemy.exc.IntegrityError as err:
+            msg = 'Can\'t remove container that is used by stored items'
+            ui.notify(msg)
+            log(ERROR, f'{msg} Error: {str(err)}')
+        except Exception as err:
+            msg = 'Error during deletion of container'
+            ui.notify(msg)
+            log(ERROR, f'{msg} Error: {str(err)}')
+            raise err
+        else:
+            ui.open(page_containers)
+        pass
 
     # Page layout
     header()
+
+    # Dialog - yes no
+    dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+
+    # Dialog - show container
+    dial_show_c = ui.dialog(value=False)
+    dial_show_c.classes('w-full')
+    with dial_show_c, ui.card().classes('w-full'):
+        dialog_label_id = ui.label('Container info:')
+        dialog_label_loc = ui.label('Container info:')
+        dialog_label_dsc = ui.label('Description')
+        #
+        with ui.row().classes('w-full no-wrap'):
+            dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete_container)
+            dialog_btn_edit.classes('w-1/2')
+            #
+            dialog_btn_close = ui.button('Close', on_click=dial_show_c.close)
+            dialog_btn_close.classes('w-1/2')
 
     card = ui.card()
     card.classes('w-full items-center')
@@ -208,14 +267,9 @@ def page_containers():
     with card_list:
         obj = ui.label(f'Existing containers {len(app.get_containers())}')
 
-        grid = ui.aggrid(
-            options=app.get_containers_grid()
-        )
+        grid = ui.aggrid(options=app.get_containers_grid())
+        grid.on('cellClicked', lambda event: handler_show_container(event))
         grid.classes('w-full')
-
-        btn_create = ui.button('Delete')
-        btn_create.classes('w-full')
-        btn_create.disable()
     pass
 
 
