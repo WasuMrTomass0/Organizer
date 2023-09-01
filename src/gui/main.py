@@ -33,11 +33,14 @@ def header():
                 ui.menu_item('Stored items - Create', lambda: ui.open(page_stored_items_create))
                 ui.menu_item('Stored items - Search', lambda: ui.open(page_stored_items_search))
         # Title
-        ui.label('Organizer')
+        with ui.link(target=page_home):
+            ui.image('data\organizer_logo.png').classes('w-64')
+
         # Dark/Light mode
         dark = ui.dark_mode()
         # light_mode dark_mode
         obj = ui.button(icon='light_mode', on_click=lambda: dark.toggle())
+        obj.disable()
 
     pass
 
