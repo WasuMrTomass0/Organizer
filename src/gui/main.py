@@ -89,8 +89,8 @@ def page_locations():
 
     # # # # # # # #
     async def handler_delete_location():
-        dialog_yes_no.open()
-        yes = await dialog_yes_no
+        dialog_delete_back.open()
+        yes = await dialog_delete_back
         if not yes:
             return
 
@@ -118,7 +118,7 @@ def page_locations():
 
     with ui.column().classes('w-full items-center'):
         # Dialog - yes no
-        dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+        dialog_delete_back = cmn.create_dialog_delete_back(label='Are you sure you want to delete location?')
 
         # Create new location
         card_create = ui.card()
@@ -202,8 +202,8 @@ def page_containers():
 
     async def handler_delete_container():
         # Confirm choice
-        dialog_yes_no.open()
-        yes = await dialog_yes_no
+        dialog_delete_back.open()
+        yes = await dialog_delete_back
         if not yes:
             return
         # Delete container
@@ -231,7 +231,7 @@ def page_containers():
 
     with ui.column().classes('w-full items-center'):
         # Dialog - yes no
-        dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+        dialog_delete_back = cmn.create_dialog_delete_back(label='Are you sure you want to delete container?')
 
         # Dialog - show container
         dial_show_c = ui.dialog(value=False)
@@ -444,8 +444,8 @@ def page_stored_items_search():
         pass
 
     async def handler_delete():
-        dialog_yes_no.open()
-        yes = await dialog_yes_no
+        dialog_delete_back.open()
+        yes = await dialog_delete_back
         if yes:
             try:
                 app.remove_stored_item(id=fdata.get('selected_item_id'))
@@ -468,7 +468,7 @@ def page_stored_items_search():
 
     with ui.column().classes('w-full items-center'):
         # Dialog - yes no
-        dialog_yes_no = cmn.create_dialog_yes_no(label=None)
+        dialog_delete_back = cmn.create_dialog_delete_back(label='Are you sure you want to delete item?')
 
         # Dialog - show image
         dial_show_si = ui.dialog(value=False)
