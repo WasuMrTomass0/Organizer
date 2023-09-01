@@ -1,17 +1,17 @@
 from nicegui import ui
 from nicegui import events
-# from PIL import Image
-# import io
 
 from app.organizer import Organizer
 from gui.front_data import FrontData
 import gui.common as cmn
 
-#
+
+# Global variables
 app = Organizer()
 fdata = FrontData()
 
 
+# Header with links to all pages
 def header():
     # Create header with menu and dark/light mode
     header = ui.header(elevated=True, fixed=False)
@@ -317,7 +317,7 @@ def page_stored_items_search():
     # Clear data
     fdata.clear('containerids')
     fdata.clear('name')
-    fdata.clear('delete_id')
+    fdata.clear('selected_item_id')
 
     def handler_search():
         sel_stored_items.call_api_method(
@@ -333,7 +333,7 @@ def page_stored_items_search():
         # Load sotred item
         si = app.get_stored_item(id=event.args["data"]["id"])
         # Set selected id
-        fdata.set('delete_id', si.id)
+        fdata.set('selected_item_id', si.id)
         # Set dialog widgets
         dialog_label.set_text(
             f'ID{si.id} [#{si.quantity}] {si.name}'
@@ -353,12 +353,21 @@ def page_stored_items_search():
         yes = await dialog_yes_no
         if yes:
             try:
-                app.remove_stored_item(id=fdata.get('delete_id'))
+                app.remove_stored_item(id=fdata.get('selected_item_id'))
             except Exception as err:
                 ui.notify(str(err))
                 raise err
             else:
                 ui.open(page_stored_items_search)
+    
+    def handler_item_take_out():
+        try:
+            app.add_item_in_use(id=fdata.get('selected_item_id'))
+        except Exception as err:
+            ui.notify(str(err))
+            raise err
+        else:
+            ui.open(page_stored_items_search)
 
     header()
 
@@ -383,9 +392,12 @@ def page_stored_items_search():
             dialog_btn_edit.classes('w-1/2')
             dialog_btn_edit.disable()
         #
-        dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
-        dialog_btn_close.classes('w-full')
-
+        with ui.row().classes('w-full no-wrap'):
+            dialog_btn_take_out = ui.button('Take out', on_click=handler_item_take_out)
+            dialog_btn_take_out.classes('w-1/2')
+            #
+            dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
+            dialog_btn_close.classes('w-1/2')
 
     card = ui.card()
     card.classes('w-full items-center')

@@ -6,6 +6,7 @@ from database.database import Database
 from database.locations import Location
 from database.container import Container
 from database.stored_item import StoredItem
+from database.item_in_use import ItemInUse
 
 
 logger = logging.getLogger(__name__)
@@ -155,5 +156,16 @@ class Organizer:
                 } for si in data
             ]
         }
+
+    # ITEMS IN USE
+    def add_item_in_use(self, id: int) -> None:
+        # Read item from id
+        item = self.get_stored_item(id=id)
+        # Create ItemInUse object
+        item_in_use = ItemInUse.from_stored_item(item)
+        # Add item to in use table
+        self._insert(obj=item_in_use)
+        # Delete item from storage table
+        self.remove_stored_item(item.id)
 
     pass
