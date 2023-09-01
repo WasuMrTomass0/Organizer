@@ -14,6 +14,9 @@ from logger import log
 app = Organizer()
 fdata = FrontData()
 
+MAX_WIDTH = 2000  # pixels
+MIN_WIDTH = 250  # pixels
+
 
 # Header with links to all pages
 def header():
@@ -52,7 +55,7 @@ def page_home():
     with ui.column().classes('w-full items-center'):
         card_create = ui.card()
         card_create.classes('w-full items-center')
-        card_create.style("max-width:1000px; min-width:250px;")
+        card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
             ui.button('Item Create', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
             ui.button('Item Search', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
@@ -120,7 +123,7 @@ def page_locations():
         # Create new location
         card_create = ui.card()
         card_create.classes('w-full items-center')
-        card_create.style("max-width:1000px; min-width:250px;")
+        card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
             obj = ui.label('Create location')
 
@@ -136,7 +139,7 @@ def page_locations():
         # List all locations
         card_list = ui.card()
         card_list.classes('w-full items-center')
-        card_list.style("max-width:1000px; min-width:250px;")
+        card_list.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_list:
             obj = ui.label(f'Existing locations {len(app.get_location_names())}')
 
@@ -247,7 +250,7 @@ def page_containers():
 
         card = ui.card()
         card.classes('w-full items-center')
-        card.style("max-width:1000px; min-width:250px;")
+        card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             obj = ui.label('Create container')
 
@@ -269,7 +272,7 @@ def page_containers():
         # List all containers
         card_list = ui.card()
         card_list.classes('w-full items-center')
-        card_list.style("max-width:1000px; min-width:250px;")
+        card_list.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_list:
             obj = ui.label(f'Existing containers {len(app.get_containers())}')
 
@@ -344,7 +347,7 @@ def page_stored_items_create():
     with ui.column().classes('w-full items-center'):
         card = ui.card()
         card.classes('w-full items-center')
-        card.style("max-width:1000px; min-width:250px;")
+        card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
             obj = ui.label('Create stored item')
@@ -494,7 +497,7 @@ def page_stored_items_search():
 
         card = ui.card()
         card.classes('w-full items-center')
-        card.style("max-width:1000px; min-width:250px;")
+        card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
             obj = ui.label('Search for stored item')
