@@ -14,7 +14,7 @@ from logger import log
 app = Organizer()
 fdata = FrontData()
 
-MAX_WIDTH = 2000  # pixels
+MAX_WIDTH = 1650  # pixels
 MIN_WIDTH = 250  # pixels
 
 
