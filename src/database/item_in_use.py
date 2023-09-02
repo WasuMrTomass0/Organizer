@@ -39,3 +39,16 @@ class ItemInUse(Base):
             created=si.created,
             edited=si.edited,
         )
+
+    @staticmethod
+    def to_stored_item(iiu: "ItemInUse") -> "StoredItem":
+        return StoredItem(
+            id=iiu.id,
+            containerid=iiu.containerid,
+            name=iiu.name,
+            description=iiu.description,
+            quantity=iiu.quantity,
+            image=iiu.image,
+            created=iiu.created,
+            edited=iiu.edited,
+        )

@@ -4,7 +4,20 @@ from PIL import Image
 import base64
 from PIL import Image
 from io import BytesIO
+from logger import error
 
+
+def wrapper_catch_error(fn):
+    def new_fn(*args, **kwargs):
+        try:
+            ret = fn(*args, **kwargs)
+        except Exception as err:
+            ui.notify(f'Error occured: {str(err)}')
+            error(msg=str(err), delta=1)
+            raise err
+        else:
+            return ret
+    return new_fn
 
 @contextmanager
 def disable_element(element) -> None:
@@ -30,7 +43,7 @@ def is_int_positive(label: str, value: int) -> bool:
         ui.notify(f'{label} is invalid. Got "{str(value)}"')
         return False
 
-    if value > 0:
+    if value <= 0:
         ui.notify(f'{label} is invalid. Got {value}')
         return False
 

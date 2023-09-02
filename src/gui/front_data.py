@@ -10,6 +10,10 @@ class FrontData:
     def clear(self, key: str) -> None:
         self._data[key] = None
 
+    def clear_keys(self, keys: "list[str]") -> None:
+        for k in keys:
+            self.clear(k)
+
     def set(self, key: str, value: Any) -> None:
         self._data[key] = value
 

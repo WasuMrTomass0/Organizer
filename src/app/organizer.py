@@ -176,4 +176,51 @@ class Organizer:
         # Delete item from storage table
         self.remove_stored_item(item.id)
 
+    def move_item_in_use_back(self, id: int) -> None:
+        # Read item from id
+        item_in_use = self.get_item_in_use(id=id)
+        # Create StoredItem object
+        stored_item = ItemInUse.to_stored_item(item_in_use)
+        # Add item to stored table
+        self._insert(obj=stored_item)
+        # Delete item from in use table
+        self.remove_item_in_use(item_in_use.id)
+
+    def remove_item_in_use(self, id: int) -> None:
+        self._db.remove(
+            cls=ItemInUse,
+            conditions=[ItemInUse.id == id]
+        )
+
+    def get_items_in_use(self, limit: int = None, conditions: list = None) -> "list[StoredItem]":
+        with self._db:
+            return self._db.get(ItemInUse, limit, conditions)
+
+    def get_item_in_use(self, id: int) -> ItemInUse:
+        conditions = [ ItemInUse.id == id ]
+        return self.get_items_in_use(None, conditions)[0]
+
+    def get_items_in_use_grid(self, name: str = None, containerids: "list[int]" = None) -> dict:
+        conditions = []
+        if name:
+            conditions.append(ItemInUse.name.like('%' + name + '%'))
+        if containerids:
+            conditions.append(ItemInUse.containerid.in_(containerids))
+
+        data = self.get_items_in_use(None, conditions)  # type: list[ItemInUse]
+
+        return {
+            'columnDefs': [
+                {'headerName': 'Stored item', 'field': 'str', 'resizable': True},
+                {'headerName': 'Description', 'field': 'description', 'resizable': True}, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
+            ],
+            'rowData': [
+                {
+                    'id': si.id,
+                    'str': si.name,
+                    'description': f'[#{si.quantity}] {si.description}',
+                } for si in data
+            ]
+        }
+
     pass
