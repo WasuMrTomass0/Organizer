@@ -43,7 +43,7 @@ def is_int_positive(label: str, value: int) -> bool:
         ui.notify(f'{label} is invalid. Got "{str(value)}"')
         return False
 
-    if value > 0:
+    if value <= 0:
         ui.notify(f'{label} is invalid. Got {value}')
         return False
 

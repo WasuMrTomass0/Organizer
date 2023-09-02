@@ -313,7 +313,7 @@ def page_stored_items_create():
             cmn.is_str_empty('Container QR Code', containerid),
             cmn.is_str_empty('Name', name),
             # cmn.is_str_empty('Description', description),
-            cmn.is_int_positive('Quantity', quantity),
+            not cmn.is_int_positive('Quantity', quantity),
         ])
         # Image can be None
         # if image is None:
