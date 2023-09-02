@@ -176,6 +176,16 @@ class Organizer:
         # Delete item from storage table
         self.remove_stored_item(item.id)
 
+    def move_item_in_use_back(self, id: int) -> None:
+        # Read item from id
+        item_in_use = self.get_item_in_use(id=id)
+        # Create StoredItem object
+        stored_item = ItemInUse.to_stored_item(item_in_use)
+        # Add item to stored table
+        self._insert(obj=stored_item)
+        # Delete item from in use table
+        self.remove_item_in_use(item_in_use.id)
+
     def remove_item_in_use(self, id: int) -> None:
         self._db.remove(
             cls=ItemInUse,

@@ -550,10 +550,12 @@ def page_items_in_use():
         fdata.set('selected_item_id', item.id)
         dialog_item.load_item(item=item)
 
+    # Button handlers
     @cmn.wrapper_catch_error
     def handler_delete():
         app.remove_item_in_use(id=fdata.get('selected_item_id'))
-        ui.open(page_items_in_use)
+        handler_search()
+        dialog_item.close()
 
     @cmn.wrapper_catch_error
     def handler_edit():
@@ -561,7 +563,9 @@ def page_items_in_use():
 
     @cmn.wrapper_catch_error
     def handler_put_back():
-        pass
+        app.move_item_in_use_back(id=fdata.get('selected_item_id'))
+        handler_search()
+        dialog_item.close()
 
     # UI
     header()

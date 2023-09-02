@@ -33,20 +33,23 @@ class DialogConfirmChoice:
         )
         pass
 
+    def __enter__(self):
+        self.open()
+
+    def __exit__(self):
+        self.close()
+
+    def append_close_to_handler(self, handler):
+        def fn():
+            handler()
+            self.dlg.close()
+        return fn if handler is not None else self.dlg.close
+
     def _create_widget(
             self,
             handler_button_confirm,
             handler_button_close,
             ) -> None:
-        # Default close action is appended to handler
-        if handler_button_close is None:
-            handler_button_close = self.close
-        else:
-            def new_fn():
-                handler_button_close()
-                self.close()
-            handler_button_close = new_fn
-
         # Create objects that are containers for other
         self.dlg = ui.dialog(value=False)
         self.dlg.classes('w-full no-wrap items-center')
@@ -57,16 +60,19 @@ class DialogConfirmChoice:
             self.row_1 = ui.row()
             self.row_1.classes('w-full no-wrap items-center')
             with ui.row().classes('w-full no-wrap items-center'):
+                # Update handlers
+                handler_button_confirm = self.append_close_to_handler(handler_button_confirm)
+                handler_button_close = self.append_close_to_handler(handler_button_close)
                 # Canncel button
                 self.btn_cancel = ui.button(
-                    text=self.def_btn_text_cancel, 
+                    text=self.def_btn_text_cancel,
                     color=self.def_btn_color_cancel,
                     on_click=handler_button_close
                 )
                 self.btn_cancel.classes('w-1/2')
                 # Confirm button
                 self.btn_confirm = ui.button(
-                    text=self.def_btn_text_confirm, 
+                    text=self.def_btn_text_confirm,
                     color=self.def_btn_color_confirm,
                     on_click=handler_button_confirm,
                 )
@@ -88,7 +94,7 @@ class DialogConfirmChoice:
 
     def set_text_btn_cancel(self, text: str) -> None:
         self.btn_cancel.set_text(text=text)
-    
+
     async def await_choice(self) -> bool:
         choice = await self.dlg
         return choice
