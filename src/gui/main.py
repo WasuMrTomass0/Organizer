@@ -6,6 +6,8 @@ from app.organizer import Organizer
 from gui.front_data import FrontData
 import gui.common as cmn
 from logger import debug, info, warning, error, critical
+from gui.dialog_stored_item import DialogStoredItem
+from gui.dialog_confirm_choice import DialogConfirmChoice
 
 
 # Global variables
@@ -36,7 +38,7 @@ def header():
                 ui.menu_item('Containers', lambda: ui.open(page_containers))
                 ui.menu_item('Stored items - Create', lambda: ui.open(page_stored_items_create))
                 ui.menu_item('Stored items - Search', lambda: ui.open(page_stored_items_search))
-                ui.menu_item('Stored items - In use', lambda: ui.open(page_stored_items_in_use))
+                ui.menu_item('Stored items - In use', lambda: ui.open(page_items_in_use))
         # Title
         with ui.link(target=page_home):
             ui.image(IMAGE_LOGO).classes('w-64')
@@ -526,11 +528,83 @@ def page_stored_items_search():
 
 
 @ui.page('/stored_items/in-use')
-def page_stored_items_in_use():
+def page_items_in_use():
+    # Clear data
+    fdata.clear_keys(keys=[
+        'containerids',
+        'name',
+        'selected_item_id',
+    ])
 
+    #  Handlers
+    def handler_search():
+        grid_data = app.get_items_in_use_grid(
+            name=fdata.get('name'),
+            containerids=fdata.get('containerids'),
+        )['rowData']
+        sel_stored_items.call_api_method('setRowData', grid_data)
+
+    def handler_show_image(event):
+        item = app.get_item_in_use(id=event.args["data"]["id"])
+        fdata.set('selected_item_id', item.id)
+        dialog_item.load_item(item=item)
+
+    @cmn.wrapper_catch_error
+    def handler_delete():
+        app.remove_item_in_use(id=fdata.get('selected_item_id'))
+        ui.open(page_items_in_use)  
+    
+    @cmn.wrapper_catch_error
+    def handler_edit():
+        pass
+
+    @cmn.wrapper_catch_error
+    def handler_put_back():
+        pass
+
+    # UI
     header()
 
-    pass
+    with ui.column().classes('w-full items-center'):
+        # Confirm delete dialog
+        dialog_choice = DialogConfirmChoice(
+            handler_button_close=None,
+            handler_button_confirm=handler_delete,
+            def_title='Are you sure you want to delete this item?',
+            def_btn_text_confirm='Delete',
+        )
+        # Show item dialog
+        dialog_item = DialogStoredItem(
+            handler_button_delete=dialog_choice.open,
+            handler_button_edit=handler_edit,
+            handler_button_take_out=handler_put_back,
+        )
+        dialog_item.btn_take_out.set_text('Put back')
+
+        # UI layout
+        card = ui.card()
+        card.classes('w-full items-center')
+        card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
+        with card:
+            # Title
+            obj = ui.label('Search for item in use')
+            # Containers to search in
+            sel_location = ui.select(
+                label='Previously assigned container (leave empty to search in all)',
+                with_input=True,
+                multiple=True,
+                on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
+                options=app.get_containers_select())
+            sel_location.classes('w-full')
+            # Name
+            inp_name = ui.input(
+                label='Name',
+                on_change=lambda e: [fdata.set('name', e.value), handler_search()])
+            inp_name.classes('w-full')
+            # Search results
+            sel_stored_items = ui.aggrid(options=app.get_items_in_use_grid())
+            sel_stored_items.on('cellClicked', lambda event: handler_show_image(event))
+            inp_name.classes('w-full')
 
 
 def main() -> None:
