@@ -15,6 +15,9 @@ fdata = FrontData()
 MAX_WIDTH = 1650  # pixels
 MIN_WIDTH = 250  # pixels
 
+IMAGE_LOGO = 'data/organizer_logo.png'
+IMAGE_DEFAULT = 'data/no_photo.jpg'
+
 
 # Header with links to all pages
 def header():
@@ -33,9 +36,10 @@ def header():
                 ui.menu_item('Containers', lambda: ui.open(page_containers))
                 ui.menu_item('Stored items - Create', lambda: ui.open(page_stored_items_create))
                 ui.menu_item('Stored items - Search', lambda: ui.open(page_stored_items_search))
+                ui.menu_item('Stored items - In use', lambda: ui.open(page_stored_items_in_use))
         # Title
         with ui.link(target=page_home):
-            ui.image('data\organizer_logo.png').classes('w-64')
+            ui.image(IMAGE_LOGO).classes('w-64')
 
         # Dark/Light mode
         dark = ui.dark_mode()
@@ -437,7 +441,7 @@ def page_stored_items_search():
         if si.image is not None:
             dialog_image.set_source(cmn.image_to_base64(si.image))
         else:
-            with open('data/no_photo.jpg', 'rb') as f:
+            with open(IMAGE_DEFAULT, 'rb') as f:
                 dialog_image.set_source(cmn.image_to_base64(f.read()))
         pass
 
@@ -476,7 +480,7 @@ def page_stored_items_search():
             with ui.card().classes('w-full'):
                 dialog_label_dsc = ui.label('Description')
             #
-            dialog_image = ui.image('data/no_photo.jpg')
+            dialog_image = ui.image(IMAGE_DEFAULT)
             #
             with ui.row().classes('w-full no-wrap'):
                 dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete)
@@ -519,6 +523,14 @@ def page_stored_items_search():
             sel_stored_items = ui.aggrid(options=app.get_stored_items_grid())
             sel_stored_items.on('cellClicked', lambda event: handler_show_image(event))
             inp_name.classes('w-full')
+
+
+@ui.page('/stored_items/in-use')
+def page_stored_items_in_use():
+
+    header()
+
+    pass
 
 
 def main() -> None:
