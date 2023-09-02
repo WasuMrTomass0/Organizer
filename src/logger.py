@@ -35,30 +35,30 @@ def setup_logger() -> None:
     log.setLevel(logging.DEBUG)
 
 
-def log(level, msg: str):
-    caller = inspect.getframeinfo(inspect.stack()[1][0])
+def log(level, msg: str, delta: int = 0):
+    caller = inspect.getframeinfo(inspect.stack()[1+delta][0])
     full_msg = "(%s:%d) - %s" % (caller.filename, caller.lineno, msg)
     get_logger().log(level=level, msg=full_msg)
 
 
-def debug(msg: str) -> None:
-    log(level=logging.DEBUG, msg=msg)
+def debug(msg: str, delta: int = 0) -> None:
+    log(level=logging.DEBUG, msg=msg, delta=1+delta)
 
 
-def info(msg: str) -> None:
-    log(level=logging.INFO, msg=msg)
+def info(msg: str, delta: int = 0) -> None:
+    log(level=logging.INFO, msg=msg, delta=1+delta)
 
 
-def warning(msg: str) -> None:
-    log(level=logging.WARNING, msg=msg)
+def warning(msg: str, delta: int = 0) -> None:
+    log(level=logging.WARNING, msg=msg, delta=1+delta)
 
 
-def error(msg: str) -> None:
-    log(level=logging.ERROR, msg=msg)
+def error(msg: str, delta: int = 0) -> None:
+    log(level=logging.ERROR, msg=msg, delta=1+delta)
 
 
-def critical(msg: str) -> None:
-    log(level=logging.CRITICAL, msg=msg)
+def critical(msg: str, delta: int = 0) -> None:
+    log(level=logging.CRITICAL, msg=msg, delta=1+delta)
 
 
 def main():
