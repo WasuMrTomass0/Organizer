@@ -415,98 +415,67 @@ def page_stored_items_create():
 @ui.page('/stored_items/search')
 def page_stored_items_search():
     # Clear data
-    fdata.clear('containerids')
-    fdata.clear('name')
-    fdata.clear('selected_item_id')
+    fdata.clear_keys(keys=[
+        'containerids',
+        'name',
+        'selected_item_id',
+    ])
 
+    #  Handlers
     def handler_search():
-        sel_stored_items.call_api_method(
-            'setRowData',
-            app.get_stored_items_grid(
-                name=fdata.get('name'),
-                containerids=fdata.get('containerids'),
-            )['rowData']
-        )
-        pass
+        grid_data = app.get_stored_items_grid(
+            name=fdata.get('name'),
+            containerids=fdata.get('containerids'),
+        )['rowData']
+        sel_stored_items.call_api_method('setRowData', grid_data)
 
     def handler_show_image(event):
-        # Load sotred item
-        si = app.get_stored_item(id=event.args["data"]["id"])
-        # Set selected id
-        fdata.set('selected_item_id', si.id)
-        # Set dialog widgets
-        dialog_label.set_text(
-            f'ID{si.id} [#{si.quantity}] {si.name}'
-        )
-        dialog_label_dsc.set_text(si.description)
-        dial_show_si.open()
-        # Load image and update image object
-        if si.image is not None:
-            dialog_image.set_source(cmn.image_to_base64(si.image))
-        else:
-            with open(IMAGE_DEFAULT, 'rb') as f:
-                dialog_image.set_source(cmn.image_to_base64(f.read()))
+        item = app.get_stored_item(id=event.args["data"]["id"])
+        fdata.set('selected_item_id', item.id)
+        dialog_item.load_item(item=item)
+
+    # Button handlers
+    @cmn.wrapper_catch_error
+    def handler_delete():
+        app.remove_stored_item(id=fdata.get('selected_item_id'))
+        handler_search()
+        dialog_item.close()
+
+    @cmn.wrapper_catch_error
+    def handler_edit():
         pass
 
-    async def handler_delete():
-        dialog_delete_back.open()
-        yes = await dialog_delete_back
-        if yes:
-            try:
-                app.remove_stored_item(id=fdata.get('selected_item_id'))
-            except Exception as err:
-                ui.notify(str(err))
-                raise err
-            else:
-                ui.open(page_stored_items_search)
+    @cmn.wrapper_catch_error
+    def handler_take_out():
+        app.add_item_in_use(id=fdata.get('selected_item_id'))
+        handler_search()
+        dialog_item.close()
 
-    def handler_item_take_out():
-        try:
-            app.add_item_in_use(id=fdata.get('selected_item_id'))
-        except Exception as err:
-            ui.notify(str(err))
-            raise err
-        else:
-            ui.open(page_stored_items_search)
-
+    # UI
     header()
 
     with ui.column().classes('w-full items-center'):
-        # Dialog - yes no
-        dialog_delete_back = cmn.create_dialog_delete_back(label='Are you sure you want to delete item?')
+        # Confirm delete dialog
+        dialog_choice = DialogConfirmChoice(
+            handler_button_close=None,
+            handler_button_confirm=handler_delete,
+            def_title='Are you sure you want to delete this item?',
+            def_btn_text_confirm='Delete',
+        )
+        # Show item dialog
+        dialog_item = DialogStoredItem(
+            handler_button_delete=dialog_choice.open,
+            handler_button_edit=handler_edit,
+            handler_button_take_out=handler_take_out,
+        )
 
-        # Dialog - show image
-        dial_show_si = ui.dialog(value=False)
-        dial_show_si.classes('w-full')
-        with dial_show_si, ui.card().classes('w-full'):
-            dialog_label = ui.label('Image content:')
-            with ui.card().classes('w-full'):
-                dialog_label_dsc = ui.label('Description')
-            #
-            dialog_image = ui.image(IMAGE_DEFAULT)
-            #
-            with ui.row().classes('w-full no-wrap'):
-                dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete)
-                dialog_btn_edit.classes('w-1/2')
-                #
-                dialog_btn_edit = ui.button('Edit')
-                dialog_btn_edit.classes('w-1/2')
-                dialog_btn_edit.disable()
-            #
-            with ui.row().classes('w-full no-wrap'):
-                dialog_btn_take_out = ui.button('Take out', on_click=handler_item_take_out)
-                dialog_btn_take_out.classes('w-1/2')
-                #
-                dialog_btn_close = ui.button('Close', on_click=dial_show_si.close)
-                dialog_btn_close.classes('w-1/2')
-
+        # UI layout
         card = ui.card()
         card.classes('w-full items-center')
         card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
             obj = ui.label('Search for stored item')
-
             # Containers to search in
             sel_location = ui.select(
                 label='Container (leave empty to search in all)',
@@ -515,13 +484,11 @@ def page_stored_items_search():
                 on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
                 options=app.get_containers_select())
             sel_location.classes('w-full')
-
             # Name
             inp_name = ui.input(
                 label='Name',
                 on_change=lambda e: [fdata.set('name', e.value), handler_search()])
             inp_name.classes('w-full')
-
             # Search results
             sel_stored_items = ui.aggrid(options=app.get_stored_items_grid())
             sel_stored_items.on('cellClicked', lambda event: handler_show_image(event))
