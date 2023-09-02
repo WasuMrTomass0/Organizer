@@ -1,15 +1,8 @@
-import logging
-
-
-
 from database.database import Database
 from database.locations import Location
 from database.container import Container
 from database.stored_item import StoredItem
 from database.item_in_use import ItemInUse
-
-
-logger = logging.getLogger(__name__)
 
 
 class Organizer:

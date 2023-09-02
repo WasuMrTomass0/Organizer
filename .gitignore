@@ -7,3 +7,4 @@ venv
 doc/.$*
 # Log files
 *.log
+*.log.*

@@ -1,5 +1,6 @@
 import logging
 import inspect
+from logging import handlers
 
 
 def get_logger() -> logging.Logger:
@@ -17,7 +18,11 @@ def setup_logger() -> None:
     ch.setFormatter(formatter)
 
     # Create console handler and add formatter to it
-    fh = logging.FileHandler(filename='log.log')
+    fh = handlers.RotatingFileHandler(
+        filename='log.log',
+        maxBytes=5*1024*1024,
+        backupCount=2,
+    )
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
 
@@ -34,6 +39,26 @@ def log(level, msg: str):
     caller = inspect.getframeinfo(inspect.stack()[1][0])
     full_msg = "(%s:%d) - %s" % (caller.filename, caller.lineno, msg)
     get_logger().log(level=level, msg=full_msg)
+
+
+def debug(msg: str) -> None:
+    log(level=logging.DEBUG, msg=msg)
+
+
+def info(msg: str) -> None:
+    log(level=logging.INFO, msg=msg)
+
+
+def warning(msg: str) -> None:
+    log(level=logging.WARNING, msg=msg)
+
+
+def error(msg: str) -> None:
+    log(level=logging.ERROR, msg=msg)
+
+
+def critical(msg: str) -> None:
+    log(level=logging.CRITICAL, msg=msg)
 
 
 def main():

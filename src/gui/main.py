@@ -1,5 +1,3 @@
-from logging import ERROR
-
 import sqlalchemy
 from nicegui import ui
 from nicegui import events
@@ -7,7 +5,7 @@ from nicegui import events
 from app.organizer import Organizer
 from gui.front_data import FrontData
 import gui.common as cmn
-from logger import log
+from logger import debug, info, warning, error, critical
 
 
 # Global variables
@@ -83,7 +81,7 @@ def page_locations():
         except Exception as err:
             msg = 'Error during creation of location'
             ui.notify(msg)
-            log(ERROR, f'{msg} Error: {str(err)}')
+            error(f'{msg} Error: {str(err)}')
         else:
             ui.open(page_locations)
 
@@ -103,12 +101,12 @@ def page_locations():
         except sqlalchemy.exc.IntegrityError as err:
             msg = 'Can\'t remove location that is used by containers'
             ui.notify(msg)
-            log(ERROR, f'{msg} Error: {str(err)}')
+            error(f'{msg} Error: {str(err)}')
 
         except Exception as err:
             msg = 'Error during deletion of location'
             ui.notify(msg)
-            log(ERROR, f'{msg} Error: {str(err)}')
+            error(f'{msg} Error: {str(err)}')
         else:
             ui.open(page_locations)
 
@@ -216,11 +214,11 @@ def page_containers():
         except sqlalchemy.exc.IntegrityError as err:
             msg = 'Can\'t remove container that is used by stored items'
             ui.notify(msg)
-            log(ERROR, f'{msg} Error: {str(err)}')
+            error(f'{msg} Error: {str(err)}')
         except Exception as err:
             msg = 'Error during deletion of container'
             ui.notify(msg)
-            log(ERROR, f'{msg} Error: {str(err)}')
+            error(f'{msg} Error: {str(err)}')
             raise err
         else:
             ui.open(page_containers)
