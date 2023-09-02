@@ -15,6 +15,8 @@ def wrapper_catch_error(fn):
             ui.notify(f'Error occured: {str(err)}')
             error(msg=str(err), delta=1)
             raise err
+        else:
+            return ret
     return new_fn
 
 @contextmanager
