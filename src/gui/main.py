@@ -61,8 +61,9 @@ def page_home():
         card_create.classes('w-full items-center')
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
-            ui.button('Item Create', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
-            ui.button('Item Search', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
+            ui.button('New item', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
+            ui.button('Stored item', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
+            ui.button('In use item', on_click=lambda: ui.open(page_items_in_use)).classes('w-full')
             ui.button('Location', on_click=lambda: ui.open(page_locations)).classes('w-full')
             ui.button('Container', on_click=lambda: ui.open(page_containers)).classes('w-full')
 
@@ -552,8 +553,8 @@ def page_items_in_use():
     @cmn.wrapper_catch_error
     def handler_delete():
         app.remove_item_in_use(id=fdata.get('selected_item_id'))
-        ui.open(page_items_in_use)  
-    
+        ui.open(page_items_in_use)
+
     @cmn.wrapper_catch_error
     def handler_edit():
         pass
