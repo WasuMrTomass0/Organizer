@@ -291,64 +291,53 @@ def page_containers():
 @ui.page('/stored_items/create')
 def page_stored_items_create():
     # Clear data
-    fdata.clear('containerid')
-    fdata.clear('name')
-    fdata.clear('description')
+    fdata.clear_keys([
+        'containerid',
+        'name',
+        'description',
+        'image',
+    ])
     fdata.set('quantity', 1)
-    fdata.clear('image')
 
+    # Handlers
+    @cmn.wrapper_catch_error
     def handler_upload(e: events.UploadEventArguments):
-        # ui.notify(f'{e.name = }, {e.type = }, {e.sender = }, {e.client = }, {e.content = }'        )
+        debug(msg=f'File loaded {e.name = }, {e.type = }, {e.sender = }, {e.client = }, {e.content = }')
         data = e.content.read()
         fdata.set('image', data)
 
+    @cmn.wrapper_catch_error
     def handler_create_stored_item():
         # Read values
-        containerid = fdata.get('containerid')
         name = fdata.get('name')
-        description = fdata.get('description')
-        quantity = fdata.get('quantity')
         image = fdata.get('image')
+        quantity = int(fdata.get('quantity'))
+        containerid = fdata.get('containerid')
+        description = fdata.get('description')
         # Check data
-        err = any([
+        if any([
             cmn.is_str_empty('Container QR Code', containerid),
             cmn.is_str_empty('Name', name),
-            # cmn.is_str_empty('Description', description),
             not cmn.is_int_positive('Quantity', quantity),
-        ])
-        # Image can be None
-        # if image is None:
-        #     err = True
-        #     ui.notify('Upload image')
-
-        if err:
+            ]):
             return
 
-        try:
-            if image:
-                image = cmn.process_image(image)
-        except Exception as err:
-            ui.notify('Image error\n\n' + str(err))
-            raise err
-
-        try:
-            app.add_stored_item(
-                containerid=containerid,
-                name=name,
-                description=description,
-                quantity=quantity,
-                image=image,
-            )
-        except Exception as err:
-            ui.notify(str(err))
-            raise err
-
+        # Process image
+        if image:
+            image = cmn.process_image(image)
+        # Add stored item
+        app.add_stored_item(
+            containerid=containerid,
+            name=name,
+            description=description,
+            quantity=quantity,
+            image=image,
+        )
+        # Refresh page
         ui.open(page_stored_items_create)
 
-        pass
-
+    # UI Layout
     header()
-
 
     with ui.column().classes('w-full items-center'):
         card = ui.card()
@@ -381,10 +370,12 @@ def page_stored_items_create():
             # Quantity
             with ui.row().classes('w-full no-wrap'):
                 def update_quantity(delta: int) -> None:
-                    x = fdata.get('quantity') + delta
-                    if x > 0:
-                        fdata.set('quantity', x)
-                        inp_quantity.set_value(int(x))
+                    q = fdata.get('quantity')
+                    q = q if q else 0
+                    q += delta
+                    if q > 0:
+                        fdata.set('quantity', q)
+                        inp_quantity.set_value(int(q))
                 #
                 btn_dec = ui.button(icon='remove_circle_outline', on_click=lambda: update_quantity(-1))
                 btn_inc = ui.button(icon='add_circle_outline', on_click=lambda: update_quantity(1))
@@ -409,8 +400,6 @@ def page_stored_items_create():
             btn_create = ui.button('Create',
                 on_click=handler_create_stored_item)
             btn_create.classes('w-full')
-
-    pass
 
 
 @ui.page('/stored_items/search')
