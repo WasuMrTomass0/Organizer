@@ -67,21 +67,8 @@ def process_image(image: bytes, dim: tuple = (1024,1024), preserve_ratio: bool =
     return bytes_o.getvalue()
 
 
-# max_dim: list = None
 def image_to_base64(image: bytes) -> str:
     return f'data:image/jpeg;base64,{base64.b64encode(image).decode("ascii")}'
-
-
-def create_dialog_yes_no(label: str = None) -> ui.dialog:
-    # Question / Sentence displayed
-    label = label if label else 'Are you sure?'
-    # Widgets
-    with ui.dialog(value=False) as dialog, ui.card():
-        ui.label(label)
-        with ui.row().classes('w-full no-wrap'):
-            ui.button('No', color='green', on_click=lambda: dialog.submit(False)).classes('w-1/2')
-            ui.button('Yes', color='red', on_click=lambda: dialog.submit(True)).classes('w-1/2')
-    return dialog
 
 
 def create_dialog_delete_back(label: str = None) -> ui.dialog:
