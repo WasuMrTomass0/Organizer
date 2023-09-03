@@ -8,6 +8,7 @@ import gui.common as cmn
 from logger import debug, info, warning, error, critical
 from gui.dialog_stored_item import DialogStoredItem
 from gui.dialog_confirm_choice import DialogConfirmChoice
+from gui.dialog_container import DialogContainer
 
 
 # Global variables
@@ -163,96 +164,71 @@ def page_locations():
 @ui.page('/containers')
 def page_containers():
     # Clear data
-    fdata.clear('location')
-    fdata.clear('description')
-    fdata.clear('selected_container_id')
+    fdata.clear_keys([
+        'location',
+        'description',
+        'selected_container_id',
+    ])
 
-    # handler_create_container
+    # Handlers
+    @cmn.wrapper_catch_error
     def handler_create_container(button: ui.button):
         # Read data
         loc = fdata.get('location')
         dsc = fdata.get('description')
         # Check data
-        if dsc is None or dsc == '':
-            msg = f"{dsc}" if dsc else 'empty string'
-            ui.notify(f'Description is invalid. Got {msg}')
-            return
-        if loc is None or loc == '':
-            msg = f"{loc}" if loc else 'empty string'
-            ui.notify(f'Location is invalid. Got {msg}')
+        if any([cmn.is_str_empty('Description', dsc),
+                cmn.is_str_empty('Location', loc),
+                ]):
             return
         # Process data
-        code = app.add_container(
+        app.add_container(
             location=loc,
             description=dsc
         )
-        # Notify user
-        if code:
-            ui.notify(f'Error during creation of container')
-        else:
-            ui.open(page_containers)
+        ui.open(page_containers)
 
+    @cmn.wrapper_catch_error
+    def handler_update_grid():
+        grid_data = app.get_containers_grid()['rowData']
+        containers_grid.call_api_method('setRowData', grid_data)
+
+    @cmn.wrapper_catch_error
     def handler_show_container(event):
-        # Load container
-        cnt = app.get_container(id=event.args["data"]["id"])
-        # Set selected id
-        fdata.set('selected_container_id', cnt.id)
-        # Update labels
-        count = len(app.get_stored_items_in_container(containerid=cnt.id))
-        label = f'ID: {str(cnt.id)}, Items: {count}'
-        dialog_label_id.set_text(label)
-        dialog_label_loc.set_text('Location: ' + str(cnt.location))
-        dialog_label_dsc.set_text('Description: ' + str(cnt.description))
-        # Show dialog
-        dial_show_c.open()
+        # Load container and set its id as selected
+        container = app.get_container(id=event.args["data"]["id"])
+        fdata.set('selected_container_id', container.id)
+        # Load and open dialog
+        dialog_container.load_item(item=container, organizer=app)
+        dialog_container.open()
 
-    async def handler_delete_container():
-        # Confirm choice
-        dialog_delete_back.open()
-        yes = await dialog_delete_back
-        if not yes:
-            return
-        # Delete container
+    @cmn.wrapper_catch_error
+    def handler_delete_container():
+        # Get containerid to delete
         id = fdata.get('selected_container_id')
-        if id is None:
-            ui.notify(f'Select container to delete')
+        # Check if it is empty
+        items = app.get_stored_items_in_container(containerid=id)
+        if len(items) != 0:
+            ui.notify(f'Container is not empty! {len(items)} item(s). ' \
+                      'Move them before deleting container.')
+            dialog_container.open()
             return
-        try:
-            app.remove_container(id)
-        except sqlalchemy.exc.IntegrityError as err:
-            msg = 'Can\'t remove container that is used by stored items'
-            ui.notify(msg)
-            error(f'{msg} Error: {str(err)}')
-        except Exception as err:
-            msg = 'Error during deletion of container'
-            ui.notify(msg)
-            error(f'{msg} Error: {str(err)}')
-            raise err
-        else:
-            ui.open(page_containers)
-        pass
+        # Process request
+        app.remove_container(id)
+        handler_update_grid()
 
     # Page layout
     header()
 
     with ui.column().classes('w-full items-center'):
-        # Dialog - yes no
-        dialog_delete_back = cmn.create_dialog_delete_back(label='Are you sure you want to delete container?')
-
-        # Dialog - show container
-        dial_show_c = ui.dialog(value=False)
-        dial_show_c.classes('w-full')
-        with dial_show_c, ui.card().classes('w-full'):
-            dialog_label_id = ui.label('Container info:')
-            dialog_label_loc = ui.label('Container info:')
-            dialog_label_dsc = ui.label('Description')
-            #
-            with ui.row().classes('w-full no-wrap'):
-                dialog_btn_edit = ui.button('Delete', color='red', on_click=handler_delete_container)
-                dialog_btn_edit.classes('w-1/2')
-                #
-                dialog_btn_close = ui.button('Close', on_click=dial_show_c.close)
-                dialog_btn_close.classes('w-1/2')
+        dialog_confirm = DialogConfirmChoice(
+            def_title='Are you sure you want to delete container?',
+            handler_button_confirm=handler_delete_container,
+            def_btn_text_confirm='Delete',
+        )
+        dialog_container = DialogContainer(
+            handler_button_delete=dialog_confirm.open,
+        )
 
         card = ui.card()
         card.classes('w-full items-center')
@@ -282,9 +258,9 @@ def page_containers():
         with card_list:
             obj = ui.label(f'Existing containers {len(app.get_containers())}')
 
-            grid = ui.aggrid(options=app.get_containers_grid())
-            grid.on('cellClicked', lambda event: handler_show_container(event))
-            grid.classes('w-full')
+            containers_grid = ui.aggrid(options=app.get_containers_grid())
+            containers_grid.on('cellClicked', lambda event: handler_show_container(event))
+            containers_grid.classes('w-full')
     pass
 
 
