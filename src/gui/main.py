@@ -94,15 +94,16 @@ def page_locations():
 
     # # # # # # # #
     async def handler_delete_location():
+        name = fdata.get('selected_location_name')
+        if name is None:
+            ui.notify(f'Select location to delete')
+            return
+
         dialog_delete_back.open()
         yes = await dialog_delete_back
         if not yes:
             return
 
-        name = fdata.get('selected_location_name')
-        if name is None:
-            ui.notify(f'Select location to delete')
-            return
         try:
             app.remove_location(name)
         except sqlalchemy.exc.IntegrityError as err:
