@@ -172,7 +172,7 @@ def page_containers():
 
     # Handlers
     @cmn.wrapper_catch_error
-    def handler_create_container(button: ui.button):
+    def handler_create_container():
         # Read data
         loc = fdata.get('location')
         dsc = fdata.get('description')
@@ -369,7 +369,7 @@ def page_stored_items_create():
                 label='Item image',
                 auto_upload=True,
                 max_files=1,
-                on_upload=handler_upload)
+                on_upload=lambda e: handler_upload(e))
             upl_img.props('accept=".png,.jpg,.jpeg"')
             upl_img.classes('w-full')
             # Creation
