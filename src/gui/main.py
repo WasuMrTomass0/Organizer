@@ -72,74 +72,60 @@ def page_home():
 @ui.page('/locations')
 def page_locations():
     # Clear data on entry
-    fdata.clear('location_name')
-    fdata.clear('selected_location_name')
+    fdata.clear_keys([
+        'location_name',
+        'selected_location_name',
+    ])
 
-    # # # # # # # #
+    # #Handlers
+    @cmn.wrapper_catch_error
     def handler_create_location():
-        # Read data
+        # Read and check data
         name = fdata.get('location_name')
-        # Check data
         if cmn.is_str_empty('Location\'s name', name):
             return
-        try:
-            app.add_location(
-                name=name
-            )
-        except Exception as err:
-            msg = 'Error during creation of location'
-            ui.notify(msg)
-            error(f'{msg} Error: {str(err)}')
-        else:
-            ui.open(page_locations)
+        # Process request
+        app.add_location(name=name)
+        ui.open(page_locations)
 
-    # # # # # # # #
-    async def handler_delete_location():
+    @cmn.wrapper_catch_error
+    def handler_confirm():
         name = fdata.get('selected_location_name')
         if name is None:
             ui.notify(f'Select location to delete')
             return
-
         dialog_delete_back.open()
-        yes = await dialog_delete_back
-        if not yes:
-            return
 
-        try:
-            app.remove_location(name)
-        except sqlalchemy.exc.IntegrityError as err:
-            msg = 'Can\'t remove location that is used by containers'
-            ui.notify(msg)
-            error(f'{msg} Error: {str(err)}')
+    @cmn.wrapper_catch_error
+    def handler_delete():
+        name = fdata.get('selected_location_name')
+        app.remove_location(name)
+        ui.open(page_locations)
 
-        except Exception as err:
-            msg = 'Error during deletion of location'
-            ui.notify(msg)
-            error(f'{msg} Error: {str(err)}')
-        else:
-            ui.open(page_locations)
-
-    # # # # # # # # # # # # # # # #
-    # Page layout
+    # UI layout
     header()
-
     with ui.column().classes('w-full items-center'):
         # Dialog - yes no
-        dialog_delete_back = cmn.create_dialog_delete_back(label='Are you sure you want to delete location?')
+        dialog_delete_back = DialogConfirmChoice(
+            handler_button_confirm=handler_delete,
+            def_title='Are you sure you want to delete location?',
+            def_btn_text_confirm='Delete',
+        )
 
         # Create new location
         card_create = ui.card()
         card_create.classes('w-full items-center')
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
+            # Title
             obj = ui.label('Create location')
-
+            # Locations name
             inp_name = ui.input(
                 label='Name',
                 on_change=lambda e: fdata.set('location_name', e.value)
             )
             inp_name.classes('w-full')
-
+            # Main button
             btn_create = ui.button('Create', on_click=handler_create_location)
             btn_create.classes('w-full')
 
@@ -148,17 +134,17 @@ def page_locations():
         card_list.classes('w-full items-center')
         card_list.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_list:
+            # Title
             obj = ui.label(f'Existing locations {len(app.get_location_names())}')
-
+            # Locations name
             grid = ui.aggrid(
                 options=app.get_locations_grid()
             )
             grid.classes('w-full')
             grid.on('cellClicked', lambda event: fdata.set('selected_location_name', event.args["data"]["name"]))
-
-            btn_create = ui.button('Delete', on_click=handler_delete_location)
+            # Main button
+            btn_create = ui.button('Delete', on_click=handler_confirm)
             btn_create.classes('w-full')
-    pass
 
 
 @ui.page('/containers')
