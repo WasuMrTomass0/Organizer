@@ -7,6 +7,7 @@ from gui import common as cmn
 from gui.dialog_stored_item import DialogStoredItem
 from gui.dialog_confirm_choice import DialogConfirmChoice
 from gui.dialog_container import DialogContainer
+from gui.dialog_image_preview import DialogImagePreview
 from logger import debug, info, warning, error, critical
 
 
@@ -250,7 +251,7 @@ def page_containers():
 
 
 @ui.page('/stored_items/create')
-def page_stored_items_create():
+def page_stored_items_create(stored_item_id: int = None):
     # Clear data
     fdata.clear_keys([
         'containerid',
@@ -296,6 +297,68 @@ def page_stored_items_create():
         )
         # Refresh page
         ui.open(page_stored_items_create)
+    
+    @cmn.wrapper_catch_error
+    def handler_update_stored_item():
+        # Read values
+        name = fdata.get('name')
+        image = fdata.get('image')
+        quantity = int(fdata.get('quantity'))
+        containerid = fdata.get('containerid')
+        description = fdata.get('description')
+        # Check data
+        if any([
+            cmn.is_str_empty('Container QR Code', containerid),
+            cmn.is_str_empty('Name', name),
+            not cmn.is_int_positive('Quantity', quantity),
+            ]):
+            return
+
+        # Process image
+        if image:
+            image = cmn.process_image(image)
+        # Add stored item
+        app.update_stored_item(
+            id=stored_item_id,
+            containerid=containerid,
+            name=name,
+            description=description,
+            quantity=quantity,
+            image=image,
+        )
+        # Go to search
+        ui.open(page_stored_items_search)
+
+    # Load stored item's data into widgets
+    @cmn.wrapper_catch_error
+    def load_data_into_widgets():
+        # Get stored item
+        item = app.get_stored_item(id=stored_item_id)
+        # Update fdata
+        fdata.set('name', item.name)
+        fdata.set('image', item.image)
+        fdata.set('quantity', item.quantity)
+        fdata.set('containerid', item.containerid)
+        fdata.set('description', item.description)
+        # Update UI
+        inp_container.set_value(item.containerid)
+        inp_name.set_value(item.name)
+        txt_desc.set_value(item.description)
+        inp_quantity.set_value(item.quantity)
+        if item.image:
+            dialog_img_prv.set_image_source(cmn.image_to_base64(item.image))
+
+    # Set widgets visible / editable / etc
+    def widgets_mode_create():
+        col_create.set_visibility(True)
+        col_edit.set_visibility(False)
+
+    def widgets_mode_edit():
+        col_create.set_visibility(False)
+        col_edit.set_visibility(True)
+
+    # Dialog
+    dialog_img_prv = DialogImagePreview()
 
     # UI Layout
     header()
@@ -345,10 +408,10 @@ def page_stored_items_create():
                 on_change=lambda e: fdata.set('quantity', e.value))
                 inp_quantity.classes('w-full')
             # Description
-            txt = ui.textarea(
+            txt_desc = ui.textarea(
                 label='Description',
                 on_change=lambda e: fdata.set('description', e.value))
-            txt.classes('w-full')
+            txt_desc.classes('w-full')
             # Image
             upl_img = ui.upload(
                 label='Item image',
@@ -357,10 +420,28 @@ def page_stored_items_create():
                 on_upload=lambda e: handler_upload(e))
             upl_img.props('accept=".png,.jpg,.jpeg"')
             upl_img.classes('w-full')
-            # Creation
-            btn_create = ui.button('Create',
-                on_click=handler_create_stored_item)
-            btn_create.classes('w-full')
+
+            # Buttons - Create
+            with ui.column().classes('w-full no-wrap items-center') as col_create:
+                btn_create = ui.button('Create',
+                    on_click=handler_create_stored_item)
+                btn_create.classes('w-full')
+            # Buttons - Edit
+            with ui.column().classes('w-full no-wrap items-center') as col_edit:
+                btn_img_prv = ui.button('Preview existing image', on_click=dialog_img_prv.open)
+                btn_img_prv.classes('w-full')
+                with ui.row().classes('w-full no-wrap items-center'):
+                    btn_close = ui.button('Close', on_click=lambda: ui.open(page_stored_items_search))
+                    btn_close.classes('w-1/2')
+                    btn_edit = ui.button('Save', on_click=handler_update_stored_item)
+                    btn_edit.classes('w-1/2')
+
+    # After creating widgets
+    if stored_item_id is not None:
+        load_data_into_widgets()
+        widgets_mode_edit()
+    else:
+        widgets_mode_create()
 
 
 @ui.page('/stored_items/search')
@@ -394,7 +475,12 @@ def page_stored_items_search():
 
     @cmn.wrapper_catch_error
     def handler_edit():
-        pass
+        id = fdata.get('selected_item_id')
+        if id:
+            ui.open(
+                target=f'/stored_items/create?stored_item_id={id}',
+                new_tab=False
+            )
 
     @cmn.wrapper_catch_error
     def handler_take_out():
@@ -477,7 +563,7 @@ def page_items_in_use():
 
     @cmn.wrapper_catch_error
     def handler_edit():
-        pass
+        ui.notify('Stored item can be modified only from /search page')
 
     @cmn.wrapper_catch_error
     def handler_put_back():
