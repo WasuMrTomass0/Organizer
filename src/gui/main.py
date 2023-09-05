@@ -57,16 +57,18 @@ def header():
 def page_home():
     header()
 
+    def_width = 'w-1/2'
+
     with ui.column().classes('w-full items-center'):
         card_create = ui.card()
-        card_create.classes('w-full items-center')
+        card_create.classes(f'{def_width} items-center')
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
-            ui.button('New item', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
-            ui.button('Stored item', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
-            ui.button('In use item', on_click=lambda: ui.open(page_items_in_use)).classes('w-full')
-            ui.button('Location', on_click=lambda: ui.open(page_locations)).classes('w-full')
-            ui.button('Container', on_click=lambda: ui.open(page_containers)).classes('w-full')
+            ui.button('Create new item', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
+            ui.button('Search for stored item', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
+            ui.button('In use items', on_click=lambda: ui.open(page_items_in_use)).classes('w-full')
+            ui.button('Containers', on_click=lambda: ui.open(page_containers)).classes('w-full')
+            ui.button('Locations', on_click=lambda: ui.open(page_locations)).classes('w-full')
 
 
 @ui.page('/locations')
@@ -234,7 +236,7 @@ def page_containers():
                 options=app.get_location_names())
             sel_location.classes('w-full')
 
-            btn_create = ui.button('Create', on_click=lambda e: handler_create_container(e.sender))
+            btn_create = ui.button('Create', on_click=handler_create_container)
             btn_create.classes('w-full')
 
         # List all containers
