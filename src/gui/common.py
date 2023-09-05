@@ -19,14 +19,6 @@ def wrapper_catch_error(fn):
             return ret
     return new_fn
 
-@contextmanager
-def disable_element(element) -> None:
-    element.disable()
-    try:
-        yield
-    finally:
-        element.enable()
-
 
 def is_str_empty(label: str, value: str) -> bool:
     ret = value is None or value == ''
