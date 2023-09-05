@@ -48,8 +48,7 @@ class DialogStoredItem:
             self.lbl_title = ui.label(text='Title - Default text')
             self.lbl_desc = ui.label(text='Description - Default text')
             self.lbl_desc.classes('w-full')
-            # self.img = ui.image(IMAGE_DEFAULT)
-            self.img = ui.image('data/no_photo.jpg')
+            self.img = ui.image(self.default_image_path)
             #
             self.col_1 = ui.column()
             self.col_1.classes('w-full no-wrap items-center')
@@ -62,7 +61,6 @@ class DialogStoredItem:
                 # Edit
                 self.btn_edit = ui.button('Edit', on_click=handler_button_edit)
                 self.btn_edit.classes('w-1/2')
-                self.btn_edit.disable()
             #
             self.row_2 = ui.row()
             self.row_2.classes('w-full no-wrap items-center')
