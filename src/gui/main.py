@@ -42,7 +42,7 @@ def header():
                 ui.menu_item('Stored items - In use', lambda: ui.open(page_items_in_use))
         # Title
         with ui.link(target=page_home):
-            ui.image(IMAGE_LOGO).classes('w-64')
+            ui.image(IMAGE_LOGO).classes('w-40')
 
         # Dark/Light mode
         dark = ui.dark_mode()
