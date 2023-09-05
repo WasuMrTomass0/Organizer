@@ -17,6 +17,10 @@ class Organizer:
         with self._db:
             self._db.insert(obj)
 
+    def _update(self, obj) -> None:
+        with self._db:
+            self._db.update(obj)
+
     # LOCATIONS
     def add_location(
             self,
@@ -116,6 +120,23 @@ class Organizer:
             image: bytes
         ) -> None:
         si = StoredItem()
+        si.containerid = int(containerid)
+        si.name = name
+        si.description = description
+        si.quantity = quantity
+        si.image = image
+        self._insert(si)
+
+    def update_stored_item(
+            self,
+            id: int,
+            containerid: str,
+            name: str,
+            description: str,
+            quantity: int,
+            image: bytes
+        ) -> None:
+        si = self.get_stored_item(id=id)
         si.containerid = int(containerid)
         si.name = name
         si.description = description
