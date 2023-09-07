@@ -9,9 +9,20 @@ class Organizer:
 
     def __init__(
             self,
+            username: str = None,
+            password: str = None,
+            host: str = None,
+            port: int = None,
+            database: str = None,
         ) -> None:
-        self._db = Database()
-        pass
+        self._db = Database(
+            username=username,
+            password=password,
+            host=host,
+            port=port,
+            database=database,
+        )
+        self.check_tables()
 
     def _insert(self, obj) -> None:
         with self._db:
@@ -20,6 +31,14 @@ class Organizer:
     def _update(self, obj) -> None:
         with self._db:
             self._db.update(obj)
+
+    # COMMON
+    def check_tables(self) -> None:
+        classes = [Location, Container, StoredItem, ItemInUse]
+        for c in classes:
+            if self._db.is_table(c):
+                continue
+            self._db.create_table(cls=c)
 
     # LOCATIONS
     def add_location(

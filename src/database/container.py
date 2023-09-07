@@ -17,3 +17,12 @@ class Container(Base):
 
     def __repr__(self) -> str:
         return f'Container: id({self.id}), location({self.location}), description({self.description})'
+
+    __tableformula__ = '' \
+        'CREATE TABLE containers (' \
+        '   id INT AUTO_INCREMENT NOT NULL,' \
+        '   location VARCHAR(255) NOT NULL,' \
+        '   description TEXT,' \
+        '   PRIMARY KEY (id),' \
+        '   FOREIGN KEY (location) REFERENCES locations(name)' \
+        ') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;' \

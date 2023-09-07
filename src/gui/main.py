@@ -12,7 +12,13 @@ from logger import debug, info, warning, error, critical
 
 
 # Global variables
-app = Organizer()
+app = Organizer(
+    username='root',
+    password='',
+    host='localhost',
+    port=3306,
+    database='organizer_db',
+)
 fdata = FrontData()
 
 MAX_WIDTH = 1650  # pixels

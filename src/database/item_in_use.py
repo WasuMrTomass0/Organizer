@@ -52,3 +52,18 @@ class ItemInUse(Base):
             created=iiu.created,
             edited=iiu.edited,
         )
+
+    __tableformula__ = '' \
+        'CREATE TABLE items_in_use (' \
+        '   id INT AUTO_INCREMENT NOT NULL,' \
+        '   containerid INT NOT NULL,' \
+        '   name VARCHAR(255) NOT NULL,' \
+        '   description TEXT,' \
+        '   quantity INT NOT NULL,' \
+        '   image MEDIUMBLOB,' \
+        '   created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,' \
+        '   edited TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,' \
+        '   PRIMARY KEY (id),' \
+        '   KEY (containerid),' \
+        '   FOREIGN KEY (containerid) REFERENCES containers(id)' \
+        ') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
