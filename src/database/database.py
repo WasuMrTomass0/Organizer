@@ -1,21 +1,53 @@
 from typing import Any, Iterable
 
 import sqlalchemy as sql
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
-from sqlalchemy.sql import func
-
-from database.container import Container
-from database.stored_item import StoredItem
+from sqlalchemy.sql import text
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import create_database, database_exists
 
 
 class Database:
 
-    def __init__(self) -> None:
+    def __init__(
+            self,
+            username: str = None,
+            password: str = None,
+            host: str = None,
+            port: int = None,
+            database: str = None,
+            # params: dict = None,
+        ) -> None:
+        # Read data
+        self.username = username
+        self.password = password
+        self.host = host
+        self.port = port
+        self.database = database
+        self.url = self._create_engine_url()
+        # self.params = params
+
+        # Initialize database
+        if not self._is_database():
+            self._create_database()
+        self._connect_to_database()
+        self._open_session()
+
+    def _create_engine_url(self) -> str:
         # scheme://username:password@host/database?params
-        self._engine = sql.create_engine('mysql+pymysql://root:@localhost:3306/organizer_db')
+        scheme = 'mysql+pymysql'
+        return f'{scheme}://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}'
+
+    def _is_database(self) -> bool:
+        return database_exists(url=self.url)
+
+    def _create_database(self) -> None:
+        create_database(url=self.url, encoding='utf8mb4')
+
+    def _connect_to_database(self) -> None:
+        self._engine = sql.create_engine(url=self.url)
         self._connector = self._engine.connect()
         self._SessionClass = sessionmaker(bind=self._engine)
-        self._open_session()
+        self._session = None
 
     def __enter__(self):
         self._open_session()
@@ -58,6 +90,14 @@ class Database:
             cls (str): Class type corelated with table - must containt __tablename__
         """
         return sql.inspect(self._engine).has_table(cls.__tablename__)
+
+    def create_table(self, cls: str) -> None:
+        """Create table for ORM class
+
+        Args:
+            cls (str): Class type corelated with table - must containt __tableformula__
+        """
+        self.execute(query=text(cls.__tableformula__))
 
     def execute(self, query: str):
         """Execute sql query and return result
@@ -111,63 +151,3 @@ class Database:
         data = self.get(obj.__class__, condition)
         data[0] = obj
         self._commit()
-
-
-# db = Database()
-
-# print(db.is_table(Container))
-# print(db.is_table(StoredItem))
-
-# for e in db.get(Container, condition=Container.id < 5):
-#     print(str(e))
-
-
-# for e in db.get(StoredItem):
-#     print(str(e))
-
-# s = StoredItem()
-# s.containerid = 1
-# s.name = 'Some trousers'
-# s.description = 'Some info here'
-# db.insert(s)
-
-# import time
-# time.sleep(4)
-
-# s.name = 'Some blue trousers'
-# db.update(s)
-
-# query = ses.query(StoredItem).limit(5)
-# query
-# print(f'{query = }')
-# for q in query.all():
-#     print(q.id, q.location, q.description)
-
-
-# New element
-# c = Container()
-# c.location = 'Garage'
-# c.description = 'Some description here'
-# ses.add(c)
-# ses.commit()
-
-# # New element
-# query = ses.query(StoredItem)
-# s = StoredItem()
-# s.containerid = 1
-# s.name = 'Jacket'
-# s.description = 'Winter Jacket'
-
-# ses.add(s)
-# ses.commit()
-
-# # Edit element
-# query = ses.query(Container).limit(5)
-# q = query.all()[0]
-# q.location = 'Main room'
-# ses.commit()
-
-# query = ses.query(Container).limit(5)
-# print(f'{query = }')
-# for q in query.all():
-#     print(q.id, q.location, q.description)
