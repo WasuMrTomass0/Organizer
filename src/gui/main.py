@@ -9,23 +9,15 @@ from gui.dialog_confirm_choice import DialogConfirmChoice
 from gui.dialog_container import DialogContainer
 from gui.dialog_image_preview import DialogImagePreview
 from logger import debug, info, warning, error, critical
+from config import FILE_IMAGE_LOGO, FILE_SECRETS
 
 
 # Global variables
-app = Organizer(
-    username='root',
-    password='',
-    host='localhost',
-    port=3306,
-    database='organizer_db',
-)
+app = Organizer.from_json(FILE_SECRETS)
 fdata = FrontData()
 
 MAX_WIDTH = 1650  # pixels
 MIN_WIDTH = 250  # pixels
-
-IMAGE_LOGO = 'data/organizer_logo.png'
-IMAGE_DEFAULT = 'data/no_photo.jpg'
 
 
 # Header with links to all pages
@@ -48,7 +40,7 @@ def header():
                 ui.menu_item('Stored items - In use', lambda: ui.open(page_items_in_use))
         # Title
         with ui.link(target=page_home):
-            ui.image(IMAGE_LOGO).classes('w-40')
+            ui.image(FILE_IMAGE_LOGO).classes('w-40')
 
         # Dark/Light mode
         dark = ui.dark_mode()

@@ -1,6 +1,7 @@
 from nicegui import ui
 
 import gui.common as cmn
+from config import FILE_IMAGE_DEFAULT
 
 
 class DialogStoredItem:
@@ -10,7 +11,7 @@ class DialogStoredItem:
             handler_button_delete,
             handler_button_edit,
             handler_button_take_out,
-            default_image_path: str = 'data/no_photo.jpg'
+            default_image_path: str = FILE_IMAGE_DEFAULT
             ) -> None:
         # Defaults
         self.default_image_path = default_image_path

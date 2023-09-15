@@ -1,11 +1,12 @@
 from nicegui import ui
+from config import FILE_IMAGE_DEFAULT
 
 
 class DialogImagePreview:
 
     def __init__(
             self,
-            default_image_path: str = 'data/no_photo.jpg'
+            default_image_path: str = FILE_IMAGE_DEFAULT
             ) -> None:
         # Defaults
         self.default_image_path = default_image_path
