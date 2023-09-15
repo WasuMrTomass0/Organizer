@@ -9,17 +9,11 @@ from gui.dialog_confirm_choice import DialogConfirmChoice
 from gui.dialog_container import DialogContainer
 from gui.dialog_image_preview import DialogImagePreview
 from logger import debug, info, warning, error, critical
-from config import FILE_IMAGE_LOGO
+from config import FILE_IMAGE_LOGO, FILE_SECRETS
 
 
 # Global variables
-app = Organizer(
-    username='root',
-    password='',
-    host='localhost',
-    port=3306,
-    database='organizer_db',
-)
+app = Organizer.from_json(FILE_SECRETS)
 fdata = FrontData()
 
 MAX_WIDTH = 1650  # pixels

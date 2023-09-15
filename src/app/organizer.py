@@ -32,6 +32,22 @@ class Organizer:
         with self._db:
             self._db.update(obj)
 
+    @staticmethod
+    def from_json(path: str) -> "Organizer":
+        # Load data
+        with open(path, 'r') as f:
+            # data = f.read()
+            import json
+            data = json.load(f)
+        # Create object
+        return Organizer(
+            username=data['username'],
+            password=data['password'],
+            host=data['host'],
+            port=data['port'],
+            database=data['database'],
+        )
+
     # COMMON
     def check_tables(self) -> None:
         classes = [Location, Container, StoredItem, ItemInUse]
