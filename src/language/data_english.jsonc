@@ -3,6 +3,10 @@
     "ID": "ID",
     "Location": "Location",
     "Description": "Description",
-    "Stored_item": "Stored item"
+    "Stored_item": "Stored item",
+    "Container": "Container",
+    "empty_string": "empty string",
+    "Got": "got",
+    "is_invalid": "is invalid"
     
 }
