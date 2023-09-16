@@ -1,5 +1,9 @@
 {
+    "_empty_string": "pusty tekst",
+    "_is_invalid": "jest niepoprawne",
     "_is_not_empty": "nie jest pusty",
+    "_item_s": "przedmiot(ów)",
+    "_to_delete": "do usunięcia",
     "Are_you_sure_you_want_to_delete_": "Czy na pewno chcesz usunąć",
     "Cancel": "Anuluj",
     "Close": "Zamknij",
@@ -11,16 +15,13 @@
     "Delete": "Usuń",
     "Description": "Opis",
     "Edit": "Edytuj",
-    "_empty_string": "pusty tekst",
     "Existing_": "Istniejące",
     "Got": "Otrzymano",
     "Home_page": "Strona startowa",
     "ID": "ID",
     "Image": "Zdjęcie",
     "In_use": "W użytku",
-    "_is_invalid": "jest niepoprawne",
     "Item_in_use": "Przedmiot w użytku",
-    "_item_s": "przedmiot(ów)",
     "Items_in_container": "Przedmiotów w pojemniku",
     "Items_in_use": "Przedmioty w użytku",
     "Leave_empty_to_search_in_all": "Pozostaw puste, aby wyszukać we wszystkich",
@@ -32,6 +33,7 @@
     "Previously_assigned_container": "Poprzednio przypisany przedmiot",
     "Put_back": "Odłóż",
     "Quantity": "Ilość",
+    "Refresh_page_to_see_changes": "Odśwież stronę, aby zobaczyć zmiany",
     "Save": "Zapisz",
     "Search_for_": "Szukaj",
     "Search_for_item": "Szukaj przedmiotu",
@@ -40,6 +42,5 @@
     "Stored_item_can_be_modified_only_from_search_page": "Przedmiot może być edytowany tylko na stronie /search",
     "Stored_item": "Przechowywany przedmiot",
     "Stored_items": "Przechowywane przedmioty",
-    "Take_out": "Wyjmij",
-    "_to_delete": "do usunięcia"
+    "Take_out": "Wyjmij"
 }
