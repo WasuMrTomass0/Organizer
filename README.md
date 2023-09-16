@@ -88,7 +88,9 @@ Path `/opt/organizer` is just an example. It can be any local path you choose.
 
 #### Step 3
 
-Copy project from github to `/opt/organizer/server` and **unpack it**.
+Copy project from github to `/opt/organizer/server` and **unpack it**. 
+To achieve this run `git clone git@github.com:WasuMrTomass0/Organizer.git ./` in `/opt/organizer/server`.
+
 Example file tree is:
 ```ascii
 opt/
