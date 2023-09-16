@@ -1,16 +1,27 @@
+import json
+import os
+
+from config import DIR_LANGUAGE
+
+
 class Language:
 
     def __init__(self, language: str = None) -> None:
         self._language = language if language else 'english'
+        path = os.path.join(DIR_LANGUAGE, f'data_{self._language}.jsonc')
         self._data = {}
-        # TODO: Load data from file
+        self._load_data(path=path)
 
-    def __getattribute__(self, name):
+    def _load_data(self, path):
+        with open(path, 'r') as f:
+            self._data = json.load(f)
+
+    # def __getattribute__(self, name) -> str:
+    def __getattr__(self, name) -> str:
         if name in self._data:
             return self._data[name]
+        print('ERROR: missing' + name)
         return name
-
-    pass
 
 
 lang = Language()
