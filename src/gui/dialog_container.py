@@ -1,5 +1,7 @@
 from nicegui import ui
 
+from language.language import lang
+
 
 class DialogContainer:
 
@@ -9,8 +11,8 @@ class DialogContainer:
             handler_button_close = None,
             def_btn_color_delete: str = 'red',
             def_btn_color_close: str = 'primary',
-            def_btn_text_delete: str = 'Delete',
-            def_btn_text_close: str = 'Close',
+            def_btn_text_delete: str = lang.Delete,
+            def_btn_text_close: str = lang.Close,
             ) -> None:
         # Defaults
         self.def_btn_color_delete = def_btn_color_delete
@@ -91,13 +93,13 @@ class DialogContainer:
 
     def load_item(self, item, organizer) -> None:
         # Update UI
-        self.lbl_title.set_text(f'ID: {str(item.id)}')
-        self.lbl_location.set_text(f'Location: {str(item.location)}')
-        self.lbl_description.set_text(f'Description: {str(item.description)}')
+        self.lbl_title.set_text(f'{lang.ID}: {str(item.id)}')
+        self.lbl_location.set_text(f'{lang.Location}: {str(item.location)}')
+        self.lbl_description.set_text(f'{lang.Description}: {str(item.description)}')
         # TODO: Load items for that container - represent as table
         stored_items = organizer.get_stored_items_in_container(containerid=item.id)
         count = len(stored_items)
-        self.lbl_items.set_text(f'Items in container: {str(count)}')
+        self.lbl_items.set_text(f'{lang.Items_in_container}: {str(count)}')
 
     async def await_choice(self) -> bool:
         choice = await self.dlg

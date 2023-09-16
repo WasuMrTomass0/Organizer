@@ -1,5 +1,7 @@
 from nicegui import ui
 
+from language.language import lang
+
 
 class DialogConfirmChoice:
 
@@ -10,8 +12,8 @@ class DialogConfirmChoice:
             def_title: str = None,
             def_btn_color_confirm: str = 'red',
             def_btn_color_cancel: str = 'primary',
-            def_btn_text_confirm: str = 'Confirm',
-            def_btn_text_cancel: str = 'Cancel',
+            def_btn_text_confirm: str = lang.Confirm,
+            def_btn_text_cancel: str = lang.Cancel,
             ) -> None:
         # Defaults
         self.def_title = def_title

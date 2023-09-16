@@ -1,6 +1,8 @@
 from nicegui import ui
 from config import FILE_IMAGE_DEFAULT
 
+from language.language import lang
+
 
 class DialogImagePreview:
 
@@ -28,7 +30,7 @@ class DialogImagePreview:
         with self.dlg, ui.card().classes('w-full no-wrap items-center') as self.crd:
             self.lbl = ui.label(text='Image preview')
             self.img = ui.image(self.default_image_path)
-            self.btn = ui.button('Close', on_click=self.close)
+            self.btn = ui.button(lang.Close, on_click=self.close)
             self.btn.classes('w-full')
         pass
 

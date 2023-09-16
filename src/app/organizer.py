@@ -3,6 +3,7 @@ from database.locations import Location
 from database.container import Container
 from database.stored_item import StoredItem
 from database.item_in_use import ItemInUse
+from language.language import lang
 
 
 class Organizer:
@@ -81,7 +82,7 @@ class Organizer:
     def get_locations_grid(self) -> dict:
         return {
             'columnDefs': [
-                {'headerName': 'Name', 'field': 'name'},
+                {'headerName': lang.Name, 'field': 'name'},
             ],
             'rowData': [
                 {'name': loc.name} for loc in self.get_locations()
@@ -132,9 +133,9 @@ class Organizer:
     def get_containers_grid(self) -> dict:
         return {
             'columnDefs': [
-                {'headerName': 'ID', 'field': 'id'},
-                {'headerName': 'Location', 'field': 'location', 'filter': 'agTextColumnFilter', 'floatingFilter': True},
-                {'headerName': 'Description', 'field': 'description', 'filter': 'agTextColumnFilter', 'floatingFilter': True},
+                {'headerName': lang.ID, 'field': 'id'},
+                {'headerName': lang.Location, 'field': 'location', 'filter': 'agTextColumnFilter', 'floatingFilter': True},
+                {'headerName': lang.Description, 'field': 'description', 'filter': 'agTextColumnFilter', 'floatingFilter': True},
             ],
             'rowData': [
                 {
@@ -209,8 +210,8 @@ class Organizer:
 
         return {
             'columnDefs': [
-                {'headerName': 'Stored item', 'field': 'str', 'resizable': True},
-                {'headerName': 'Description', 'field': 'description', 'resizable': True}, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
+                {'headerName': lang.Stored_item, 'field': 'str', 'resizable': True},
+                {'headerName': lang.Description, 'field': 'description', 'resizable': True}, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
             ],
             'rowData': [
                 {
@@ -267,8 +268,8 @@ class Organizer:
 
         return {
             'columnDefs': [
-                {'headerName': 'Stored item', 'field': 'str', 'resizable': True},
-                {'headerName': 'Description', 'field': 'description', 'resizable': True}, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
+                {'headerName': lang.Stored_item, 'field': 'str', 'resizable': True},
+                {'headerName': lang.Description, 'field': 'description', 'resizable': True}, #'filter': 'agTextColumnFilter', 'floatingFilter': True},
             ],
             'rowData': [
                 {
