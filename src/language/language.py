@@ -9,7 +9,7 @@ class Language:
 
     def __init__(self, language: str = None) -> None:
         self._language = language if language else 'english'
-        path = os.path.join(DIR_LANGUAGE, f'data_{self._language}.json')
+        path = os.path.join(DIR_LANGUAGE, f'{self._language}.json')
         self._data = {}
         self._load_data(path=path)
 
