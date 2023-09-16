@@ -8,3 +8,5 @@ doc/.$*
 # Log files
 *.log
 *.log.*
+# Secrets
+data/secrets.json
