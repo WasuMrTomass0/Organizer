@@ -7,6 +7,12 @@
     "Container": "Container",
     "empty_string": "empty string",
     "Got": "got",
-    "is_invalid": "is invalid"
-    
+    "is_invalid": "is invalid",
+    "Confirm": "Confirm",
+    "Cancel": "Cancel",
+    "Delete": "Delete",
+    "Close": "Close",
+    "Edit": "Edit",
+    "Items_in_container": "Items in container",
+    "Take_out": "Take out"    
 }

@@ -3,6 +3,8 @@ from nicegui import ui
 import gui.common as cmn
 from config import FILE_IMAGE_DEFAULT
 
+from language.language import lang
+
 
 class DialogStoredItem:
 
@@ -57,20 +59,20 @@ class DialogStoredItem:
             self.row_1.classes('w-full no-wrap items-center')
             with ui.row().classes('w-full no-wrap items-center'):
                 # Delete
-                self.btn_delete = ui.button('Delete', color='red', on_click=handler_button_delete)
+                self.btn_delete = ui.button(lang.Delete, color='red', on_click=handler_button_delete)
                 self.btn_delete.classes('w-1/2')
                 # Edit
-                self.btn_edit = ui.button('Edit', on_click=handler_button_edit)
+                self.btn_edit = ui.button(lang.Edit, on_click=handler_button_edit)
                 self.btn_edit.classes('w-1/2')
             #
             self.row_2 = ui.row()
             self.row_2.classes('w-full no-wrap items-center')
             with self.row_2:
                 # Take out
-                self.btn_take_out = ui.button('Take out', on_click=handler_button_take_out)
+                self.btn_take_out = ui.button(lang.Take_out, on_click=handler_button_take_out)
                 self.btn_take_out.classes('w-1/2')
                 # Close
-                self.btn_close = ui.button('Close', on_click=self.dlg.close)
+                self.btn_close = ui.button(lang.Close, on_click=self.dlg.close)
                 self.btn_close.classes('w-1/2')
         pass
 
