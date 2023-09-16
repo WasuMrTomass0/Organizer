@@ -2,13 +2,14 @@ import json
 import os
 
 from config import DIR_LANGUAGE
+from logger import warning
 
 
 class Language:
 
     def __init__(self, language: str = None) -> None:
         self._language = language if language else 'english'
-        path = os.path.join(DIR_LANGUAGE, f'data_{self._language}.jsonc')
+        path = os.path.join(DIR_LANGUAGE, f'data_{self._language}.json')
         self._data = {}
         self._load_data(path=path)
 
@@ -19,6 +20,7 @@ class Language:
     def __getattr__(self, name) -> str:
         if name in self._data:
             return self._data[name]
+        warning(msg=f'Unrecognized word key: "{name}"', delta=1)
         return name
 
 
