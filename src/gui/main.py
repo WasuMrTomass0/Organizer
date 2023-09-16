@@ -9,13 +9,15 @@ from gui.dialog_confirm_choice import DialogConfirmChoice
 from gui.dialog_container import DialogContainer
 from gui.dialog_image_preview import DialogImagePreview
 from logger import debug, info, warning, error, critical
-from config import FILE_IMAGE_LOGO, FILE_SECRETS
+from config import FILE_IMAGE_LOGO, FILE_SECRETS, FILE_IMAGE_FLAG_PL
+from config import FILE_IMAGE_FLAG_ENG
 from language.language import lang
 
 
 # Global variables
 app = Organizer.from_json(FILE_SECRETS)
 fdata = FrontData()
+fdata.set('dark_mode', False)
 
 MAX_WIDTH = 1650  # pixels
 MIN_WIDTH = 250  # pixels
@@ -27,6 +29,14 @@ def header():
     header = ui.header(elevated=True, fixed=False)
     header.style('background-color: #3874c8')
     header.classes('items-center justify-between')
+
+    def handler_settings(fn):
+        if fn:
+            fn()
+            ui.notify(lang.Refresh_page_to_see_changes)
+
+    def handler_theme():
+        fdata.set('dark_mode', not bool(fdata.get('dark_mode')))
 
     with header:
         # Menu with pages
@@ -44,11 +54,17 @@ def header():
             ui.image(FILE_IMAGE_LOGO).classes('w-40')
 
         # Dark/Light mode
-        dark = ui.dark_mode()
-        # light_mode dark_mode
-        obj = ui.button(icon='light_mode', on_click=lambda: dark.toggle())
-        obj.disable()
-
+        dark = ui.dark_mode(value=fdata.get('dark_mode'))
+        # Settings
+        with ui.button(icon='settings'):
+            with ui.menu().classes('w-20') as menu:
+                with ui.menu_item(None, lambda: handler_settings(fn=handler_theme)):
+                    ui.icon(name='dark_mode').classes('w-full')
+                ui.separator()
+                with ui.menu_item(None, lambda: handler_settings(fn=lang.set_english)):
+                    ui.image(source=FILE_IMAGE_FLAG_ENG)
+                with ui.menu_item(None, lambda: handler_settings(fn=lang.set_polish)):
+                    ui.image(source=FILE_IMAGE_FLAG_PL)
     pass
 
 
