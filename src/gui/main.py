@@ -10,6 +10,7 @@ from gui.dialog_container import DialogContainer
 from gui.dialog_image_preview import DialogImagePreview
 from logger import debug, info, warning, error, critical
 from config import FILE_IMAGE_LOGO, FILE_SECRETS
+from language.language import lang
 
 
 # Global variables
@@ -31,13 +32,13 @@ def header():
         # Menu with pages
         with ui.button(icon='menu'):
             with ui.menu() as menu:
-                ui.menu_item('Home', lambda: ui.open(page_home))
+                ui.menu_item(lang.Home_page, lambda: ui.open(page_home))
                 ui.separator()
-                ui.menu_item('Locations', lambda: ui.open(page_locations))
-                ui.menu_item('Containers', lambda: ui.open(page_containers))
-                ui.menu_item('Stored items - Create', lambda: ui.open(page_stored_items_create))
-                ui.menu_item('Stored items - Search', lambda: ui.open(page_stored_items_search))
-                ui.menu_item('Stored items - In use', lambda: ui.open(page_items_in_use))
+                ui.menu_item(lang.Locations, lambda: ui.open(page_locations))
+                ui.menu_item(lang.Containers, lambda: ui.open(page_containers))
+                ui.menu_item(f'{lang.Stored_items} - {lang.Create}', lambda: ui.open(page_stored_items_create))
+                ui.menu_item(f'{lang.Stored_items} - {lang.Search}', lambda: ui.open(page_stored_items_search))
+                ui.menu_item(f'{lang.Stored_items} - {lang.In_use}', lambda: ui.open(page_items_in_use))
         # Title
         with ui.link(target=page_home):
             ui.image(FILE_IMAGE_LOGO).classes('w-40')
@@ -62,11 +63,11 @@ def page_home():
         card_create.classes(f'{def_width} items-center')
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
-            ui.button('Create new item', on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
-            ui.button('Search for stored item', on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
-            ui.button('In use items', on_click=lambda: ui.open(page_items_in_use)).classes('w-full')
-            ui.button('Containers', on_click=lambda: ui.open(page_containers)).classes('w-full')
-            ui.button('Locations', on_click=lambda: ui.open(page_locations)).classes('w-full')
+            ui.button(lang.Create_new_item, on_click=lambda: ui.open(page_stored_items_create)).classes('w-full')
+            ui.button(lang.Search_for_item, on_click=lambda: ui.open(page_stored_items_search)).classes('w-full')
+            ui.button(lang.Items_in_use, on_click=lambda: ui.open(page_items_in_use)).classes('w-full')
+            ui.button(lang.Containers, on_click=lambda: ui.open(page_containers)).classes('w-full')
+            ui.button(lang.Locations, on_click=lambda: ui.open(page_locations)).classes('w-full')
 
 
 @ui.page('/locations')
@@ -82,7 +83,7 @@ def page_locations():
     def handler_create_location():
         # Read and check data
         name = fdata.get('location_name')
-        if cmn.is_str_empty('Location\'s name', name):
+        if cmn.is_str_empty(lang.Name, name):
             return
         # Process request
         app.add_location(name=name)
@@ -92,7 +93,7 @@ def page_locations():
     def handler_confirm():
         name = fdata.get('selected_location_name')
         if name is None:
-            ui.notify(f'Select location to delete')
+            ui.notify(f'{lang.Select} {lang.Location} {lang.to_delete}')
             return
         dialog_delete_back.open()
 
@@ -108,8 +109,8 @@ def page_locations():
         # Dialog - yes no
         dialog_delete_back = DialogConfirmChoice(
             handler_button_confirm=handler_delete,
-            def_title='Are you sure you want to delete location?',
-            def_btn_text_confirm='Delete',
+            def_title=f'{lang.Are_you_sure_you_want_to_delete_} {lang.Location.lower()}?',
+            def_btn_text_confirm=lang.Delete,
         )
 
         # Create new location
@@ -118,7 +119,7 @@ def page_locations():
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
             # Title
-            obj = ui.label('Create location')
+            obj = ui.label(f'{lang.Create} {lang.location}')
             # Locations name
             inp_name = ui.input(
                 label='Name',
@@ -126,7 +127,7 @@ def page_locations():
             )
             inp_name.classes('w-full')
             # Main button
-            btn_create = ui.button('Create', on_click=handler_create_location)
+            btn_create = ui.button(lang.Create, on_click=handler_create_location)
             btn_create.classes('w-full')
 
         # List all locations
@@ -135,7 +136,7 @@ def page_locations():
         card_list.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_list:
             # Title
-            obj = ui.label(f'Existing locations {len(app.get_location_names())}')
+            obj = ui.label(f'{lang.Existing_} {lang.Locations.lower()} {len(app.get_location_names())}')
             # Locations name
             grid = ui.aggrid(
                 options=app.get_locations_grid()
@@ -143,7 +144,7 @@ def page_locations():
             grid.classes('w-full')
             grid.on('cellClicked', lambda event: fdata.set('selected_location_name', event.args["data"]["name"]))
             # Main button
-            btn_create = ui.button('Delete', on_click=handler_confirm)
+            btn_create = ui.button(lang.Delete, on_click=handler_confirm)
             btn_create.classes('w-full')
 
 
@@ -163,8 +164,8 @@ def page_containers():
         loc = fdata.get('location')
         dsc = fdata.get('description')
         # Check data
-        if any([cmn.is_str_empty('Description', dsc),
-                cmn.is_str_empty('Location', loc),
+        if any([cmn.is_str_empty(lang.Description, dsc),
+                cmn.is_str_empty(lang.Location, loc),
                 ]):
             return
         # Process data
@@ -195,8 +196,8 @@ def page_containers():
         # Check if it is empty
         items = app.get_stored_items_in_container(containerid=id)
         if len(items) != 0:
-            ui.notify(f'Container is not empty! {len(items)} item(s). ' \
-                      'Move them before deleting container.')
+            ui.notify(f'{lang.Container} {lang._is_not_empty}! {len(items)} {lang.item_s}. ' \
+                      f'{lang.Move_them_before_deleting_} {lang.Container.lower()}.')
             dialog_container.open()
             return
         # Process request
@@ -208,9 +209,9 @@ def page_containers():
 
     with ui.column().classes('w-full items-center'):
         dialog_confirm = DialogConfirmChoice(
-            def_title='Are you sure you want to delete container?',
+            def_title=f'{lang.Are_you_sure_you_want_to_delete_} {lang.Container.lower()}?',
             handler_button_confirm=handler_delete_container,
-            def_btn_text_confirm='Delete',
+            def_btn_text_confirm=lang.Delete,
         )
         dialog_container = DialogContainer(
             handler_button_delete=dialog_confirm.open,
@@ -220,21 +221,21 @@ def page_containers():
         card.classes('w-full items-center')
         card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
-            obj = ui.label('Create container')
+            obj = ui.label(f'{lang.Create} {lang.Container.lower()}')
 
             txt = ui.textarea(
-                label='Description',
+                label=lang.Description,
                 on_change=lambda e: fdata.set('description', e.value))
             txt.classes('w-full')
 
             sel_location = ui.select(
-                label='Location',
+                label=lang.Location,
                 with_input=True,
                 on_change=lambda e: fdata.set('location', e.value),
                 options=app.get_location_names())
             sel_location.classes('w-full')
 
-            btn_create = ui.button('Create', on_click=handler_create_container)
+            btn_create = ui.button(lang.Create, on_click=handler_create_container)
             btn_create.classes('w-full')
 
         # List all containers
@@ -242,7 +243,7 @@ def page_containers():
         card_list.classes('w-full items-center')
         card_list.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_list:
-            obj = ui.label(f'Existing containers {len(app.get_containers())}')
+            obj = ui.label(f'{lang.Existing_} {lang.Containers.lower()} {len(app.get_containers())}')
 
             containers_grid = ui.aggrid(options=app.get_containers_grid())
             containers_grid.on('cellClicked', lambda event: handler_show_container(event))
@@ -278,9 +279,9 @@ def page_stored_items_create(stored_item_id: int = None):
         description = fdata.get('description')
         # Check data
         if any([
-            cmn.is_str_empty('Container QR Code', containerid),
-            cmn.is_str_empty('Name', name),
-            not cmn.is_int_positive('Quantity', quantity),
+            cmn.is_str_empty(f'{lang.Container} {lang.ID}', containerid),
+            cmn.is_str_empty(lang.Name, name),
+            not cmn.is_int_positive(lang.Quantity, quantity),
             ]):
             return
 
@@ -297,7 +298,7 @@ def page_stored_items_create(stored_item_id: int = None):
         )
         # Refresh page
         ui.open(page_stored_items_create)
-    
+
     @cmn.wrapper_catch_error
     def handler_update_stored_item():
         # Read values
@@ -308,9 +309,9 @@ def page_stored_items_create(stored_item_id: int = None):
         description = fdata.get('description')
         # Check data
         if any([
-            cmn.is_str_empty('Container QR Code', containerid),
-            cmn.is_str_empty('Name', name),
-            not cmn.is_int_positive('Quantity', quantity),
+            cmn.is_str_empty(f'{lang.Container} {lang.ID}', containerid),
+            cmn.is_str_empty(lang.Name, name),
+            not cmn.is_int_positive(lang.Quantity, quantity),
             ]):
             return
 
@@ -369,16 +370,16 @@ def page_stored_items_create(stored_item_id: int = None):
         card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
-            obj = ui.label('Create stored item')
+            obj = ui.label(f'{lang.Create} {lang.Stored_item.lower()}')
             # Containers
             with ui.row().classes('w-full no-wrap'):
                 inp_container = ui.input(
-                    label='QR code',
+                    label=f'{lang.Container} {lang.ID}',
                     on_change=lambda e: fdata.set('containerid', e.value))
                 inp_container.classes('w-1/4')
 
                 sel_location = ui.select(
-                    label='Container',
+                    label=lang.Container,
                     with_input=True,
                     on_change=lambda e: fdata.set('containerid', e.value),
                     options=app.get_containers_select())
@@ -388,7 +389,7 @@ def page_stored_items_create(stored_item_id: int = None):
                 sel_location.bind_value(inp_container, 'value')
             # Name
             inp_name = ui.input(
-                label='Name',
+                label=lang.Name,
                 on_change=lambda e: fdata.set('name', e.value))
             inp_name.classes('w-full')
             # Quantity
@@ -404,7 +405,7 @@ def page_stored_items_create(stored_item_id: int = None):
                 btn_dec = ui.button(icon='remove_circle_outline', on_click=lambda: update_quantity(-1))
                 btn_inc = ui.button(icon='add_circle_outline', on_click=lambda: update_quantity(1))
                 #
-                inp_quantity = ui.number(label='Quantity', value=fdata.get('quantity'),
+                inp_quantity = ui.number(label=lang.Quantity, value=fdata.get('quantity'),
                 on_change=lambda e: fdata.set('quantity', e.value))
                 inp_quantity.classes('w-full')
             # Description
@@ -414,7 +415,7 @@ def page_stored_items_create(stored_item_id: int = None):
             txt_desc.classes('w-full')
             # Image
             upl_img = ui.upload(
-                label='Item image',
+                label=f'{lang.Stored_item} {lang.Image}',
                 auto_upload=True,
                 max_files=1,
                 on_upload=lambda e: handler_upload(e))
@@ -423,17 +424,17 @@ def page_stored_items_create(stored_item_id: int = None):
 
             # Buttons - Create
             with ui.column().classes('w-full no-wrap items-center') as col_create:
-                btn_create = ui.button('Create',
+                btn_create = ui.button(lang.Create,
                     on_click=handler_create_stored_item)
                 btn_create.classes('w-full')
             # Buttons - Edit
             with ui.column().classes('w-full no-wrap items-center') as col_edit:
-                btn_img_prv = ui.button('Preview existing image', on_click=dialog_img_prv.open)
+                btn_img_prv = ui.button(lang.Preview_existing_image, on_click=dialog_img_prv.open)
                 btn_img_prv.classes('w-full')
                 with ui.row().classes('w-full no-wrap items-center'):
-                    btn_close = ui.button('Close', on_click=lambda: ui.open(page_stored_items_search))
+                    btn_close = ui.button(lang.Close, on_click=lambda: ui.open(page_stored_items_search))
                     btn_close.classes('w-1/2')
-                    btn_edit = ui.button('Save', on_click=handler_update_stored_item)
+                    btn_edit = ui.button(lang.Save, on_click=handler_update_stored_item)
                     btn_edit.classes('w-1/2')
 
     # After creating widgets
@@ -496,8 +497,8 @@ def page_stored_items_search():
         dialog_choice = DialogConfirmChoice(
             handler_button_close=None,
             handler_button_confirm=handler_delete,
-            def_title='Are you sure you want to delete this item?',
-            def_btn_text_confirm='Delete',
+            def_title=f'{lang.Are_you_sure_you_want_to_delete_} {lang.Stored_item.lower()}?',
+            def_btn_text_confirm=lang.Delete,
         )
         # Show item dialog
         dialog_item = DialogStoredItem(
@@ -512,10 +513,10 @@ def page_stored_items_search():
         card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
-            obj = ui.label('Search for stored item')
+            obj = ui.label(f'{lang.Search_for_} {lang.Stored_item.lower()}')
             # Containers to search in
             sel_location = ui.select(
-                label='Container (leave empty to search in all)',
+                label=f'{lang.Container} ({lang.Leave_empty_to_search_in_all})',
                 with_input=True,
                 multiple=True,
                 on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
@@ -523,7 +524,7 @@ def page_stored_items_search():
             sel_location.classes('w-full')
             # Name
             inp_name = ui.input(
-                label='Name',
+                label=lang.Name,
                 on_change=lambda e: [fdata.set('name', e.value), handler_search()])
             inp_name.classes('w-full')
             # Search results
@@ -563,7 +564,7 @@ def page_items_in_use():
 
     @cmn.wrapper_catch_error
     def handler_edit():
-        ui.notify('Stored item can be modified only from /search page')
+        ui.notify(lang.Stored_item_can_be_modified_only_from_search_page)
 
     @cmn.wrapper_catch_error
     def handler_put_back():
@@ -579,8 +580,8 @@ def page_items_in_use():
         dialog_choice = DialogConfirmChoice(
             handler_button_close=None,
             handler_button_confirm=handler_delete,
-            def_title='Are you sure you want to delete this item?',
-            def_btn_text_confirm='Delete',
+            def_title=f'{lang.Are_you_sure_you_want_to_delete_} {lang.Stored_item.lower()}?',
+            def_btn_text_confirm=lang.Delete,
         )
         # Show item dialog
         dialog_item = DialogStoredItem(
@@ -588,7 +589,7 @@ def page_items_in_use():
             handler_button_edit=handler_edit,
             handler_button_take_out=handler_put_back,
         )
-        dialog_item.btn_take_out.set_text('Put back')
+        dialog_item.btn_take_out.set_text(lang.Put_back)
 
         # UI layout
         card = ui.card()
@@ -596,10 +597,10 @@ def page_items_in_use():
         card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
-            obj = ui.label('Search for item in use')
+            obj = ui.label(f'{lang.Search_for} {lang.Item_in_use.lower()}')
             # Containers to search in
             sel_location = ui.select(
-                label='Previously assigned container (leave empty to search in all)',
+                label=f'{lang.Previously_assigned_container} ({lang.Leave_empty_to_search_in_all.lower()})',
                 with_input=True,
                 multiple=True,
                 on_change=lambda e: [fdata.set('containerids', e.value), handler_search()],
@@ -607,7 +608,7 @@ def page_items_in_use():
             sel_location.classes('w-full')
             # Name
             inp_name = ui.input(
-                label='Name',
+                label=lang.Name,
                 on_change=lambda e: [fdata.set('name', e.value), handler_search()])
             inp_name.classes('w-full')
             # Search results
