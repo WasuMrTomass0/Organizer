@@ -12,9 +12,10 @@ repo = 'git@github.com:WasuMrTomass0/Organizer.git'
 
 
 commands = [
-    f'apt-get -y update',       # Update all tools in docker's environment
-    f'apt-get -y install git',  # Install git
-    f'git clone {repo} ./',     # Clone into current working directory
+    # Currently not supported
+    # f'apt-get -y update',       # Update all tools in docker's environment
+    # f'apt-get -y install git',  # Install git
+    # f'git clone {repo} ./',     # Clone into current working directory
     f'{sys.executable} -V',     # Debug message
     f'{sys.executable} -m pip install -r {requirements}',   # Install requirements
     f'{sys.executable} {main}', # Run server
