@@ -93,7 +93,7 @@ def page_locations():
     def handler_confirm():
         name = fdata.get('selected_location_name')
         if name is None:
-            ui.notify(f'{lang.Select} {lang.Location} {lang.to_delete}')
+            ui.notify(f'{lang.Select} {lang.Location} {lang._to_delete}')
             return
         dialog_delete_back.open()
 
@@ -119,7 +119,7 @@ def page_locations():
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card_create:
             # Title
-            obj = ui.label(f'{lang.Create} {lang.location}')
+            obj = ui.label(f'{lang.Create} {lang.Location.lower()}')
             # Locations name
             inp_name = ui.input(
                 label='Name',
@@ -196,7 +196,7 @@ def page_containers():
         # Check if it is empty
         items = app.get_stored_items_in_container(containerid=id)
         if len(items) != 0:
-            ui.notify(f'{lang.Container} {lang._is_not_empty}! {len(items)} {lang.item_s}. ' \
+            ui.notify(f'{lang.Container} {lang._is_not_empty}! {len(items)} {lang._item_s}. ' \
                       f'{lang.Move_them_before_deleting_} {lang.Container.lower()}.')
             dialog_container.open()
             return
@@ -597,7 +597,7 @@ def page_items_in_use():
         card.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
         with card:
             # Title
-            obj = ui.label(f'{lang.Search_for} {lang.Item_in_use.lower()}')
+            obj = ui.label(f'{lang.Search_for_} {lang.Item_in_use.lower()}')
             # Containers to search in
             sel_location = ui.select(
                 label=f'{lang.Previously_assigned_container} ({lang.Leave_empty_to_search_in_all.lower()})',

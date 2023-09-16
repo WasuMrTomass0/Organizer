@@ -16,11 +16,9 @@ class Language:
         with open(path, 'r') as f:
             self._data = json.load(f)
 
-    # def __getattribute__(self, name) -> str:
     def __getattr__(self, name) -> str:
         if name in self._data:
             return self._data[name]
-        print('ERROR: missing' + name)
         return name
 
 

@@ -25,8 +25,8 @@ def wrapper_catch_error(fn):
 def is_str_empty(label: str, value: str) -> bool:
     ret = value is None or value == ''
     if ret:
-        msg = str(value) if value else lang.empty_string
-        ui.notify(f'{label} {lang.is_invalid}. {lang.Got} {msg}')
+        msg = str(value) if value else lang.Empty_string.lower()
+        ui.notify(f'{label} {lang._is_invalid}. {lang.Got} {msg}')
     return ret
 
 
@@ -34,11 +34,11 @@ def is_int_positive(label: str, value: int) -> bool:
     try:
         value = float(value)
     except Exception:
-        ui.notify(f'{label} {lang.is_invalid}. {lang.Got} "{str(value)}"')
+        ui.notify(f'{label} {lang._is_invalid}. {lang.Got} "{str(value)}"')
         return False
 
     if value <= 0:
-        ui.notify(f'{label} {lang.is_invalid}. {lang.Got} {value}')
+        ui.notify(f'{label} {lang._is_invalid}. {lang.Got} {value}')
         return False
 
     return True
