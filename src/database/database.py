@@ -125,11 +125,14 @@ class Database:
         for con in conditions:
             return self._remove_single(cls=cls, condition=con)
 
-    def get(self, cls, limit: int = None, conditions: list = None):
-        """Get entry rows from
+    def get(self, cls, limit: int = None, conditions: list = None) -> list:
+        """
+        Get entry rows from
 
         Args:
             cls (Class): Class type corelated with table
+            limit (int, optional): _description_. Defaults to None.
+            conditions (list, optional): _description_. Defaults to None.
 
         Returns:
             List: Entries
@@ -151,3 +154,14 @@ class Database:
         data = self.get(obj.__class__, condition)
         data[0] = obj
         self._commit()
+
+    def count(self, cls) -> int:
+        """Count elements in table
+
+        Args:
+            cls (Class): Class type corelated with table
+
+        Returns:
+            int: Quantity
+        """
+        return self._session.query(cls).count()

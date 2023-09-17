@@ -59,10 +59,10 @@ class Organizer:
 
     def get_quick_statistics(self) -> dict:
         return {
-            lang.Total_locations: len(self.get_locations()),
-            lang.Total_containers: len(self.get_containers()),
-            lang.Total_stored_items: len(self.get_stored_items()),
-            lang.Total_items_in_use: len(self.get_items_in_use()),
+            lang.Total_locations: self.count_locations(),
+            lang.Total_containers: self.count_containers(),
+            lang.Total_stored_items: self.count_stored_items(),
+            lang.Total_items_in_use: self.count_items_in_use(),
         }
 
     # LOCATIONS
@@ -79,6 +79,9 @@ class Organizer:
             cls=Location,
             conditions=[Location.name == name]
         )
+
+    def count_locations(self) -> int:
+        return self._db.count(cls=Location)
 
     def get_locations(self) -> "list[Location]":
         with self._db:
@@ -113,6 +116,9 @@ class Organizer:
             cls=Container,
             conditions=[Container.id == id]
         )
+
+    def count_containers(self) -> int:
+        return self._db.count(cls=Container)
 
     def get_containers(self, limit: int = None, conditions: list = None) -> "list[Container]":
         with self._db:
@@ -194,6 +200,9 @@ class Organizer:
             conditions=[StoredItem.id == id]
         )
 
+    def count_stored_items(self) -> int:
+        return self._db.count(cls=StoredItem)
+
     def get_stored_item(self, id: int) -> StoredItem:
         conditions = [ StoredItem.id == id ]
         return self.get_stored_items(None, conditions)[0]
@@ -256,6 +265,9 @@ class Organizer:
             cls=ItemInUse,
             conditions=[ItemInUse.id == id]
         )
+
+    def count_items_in_use(self) -> int:
+        return self._db.count(cls=ItemInUse)
 
     def get_items_in_use(self, limit: int = None, conditions: list = None) -> "list[StoredItem]":
         with self._db:
