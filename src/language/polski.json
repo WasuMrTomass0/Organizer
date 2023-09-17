@@ -42,5 +42,10 @@
     "Stored_item_can_be_modified_only_from_search_page": "Przedmiot może być edytowany tylko na stronie /search",
     "Stored_item": "Przechowywany przedmiot",
     "Stored_items": "Przechowywane przedmioty",
-    "Take_out": "Wyjmij"
+    "Summary": "Podsumowanie",
+    "Take_out": "Wyjmij",
+    "Total_containers": "Pojemników",
+    "Total_items_in_use": "W użytku",
+    "Total_locations": "Lokalizacji",
+    "Total_stored_items": "Przechowywanych"
 }
