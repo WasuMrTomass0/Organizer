@@ -57,6 +57,14 @@ class Organizer:
                 continue
             self._db.create_table(cls=c)
 
+    def get_quick_statistics(self) -> dict:
+        return {
+            lang.Total_locations: len(self.get_locations()),
+            lang.Total_containers: len(self.get_containers()),
+            lang.Total_stored_items: len(self.get_stored_items()),
+            lang.Total_items_in_use: len(self.get_items_in_use()),
+        }
+
     # LOCATIONS
     def add_location(
             self,
