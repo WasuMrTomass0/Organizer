@@ -8,6 +8,7 @@ from gui.dialog_stored_item import DialogStoredItem
 from gui.dialog_confirm_choice import DialogConfirmChoice
 from gui.dialog_container import DialogContainer
 from gui.dialog_image_preview import DialogImagePreview
+from gui.card_quick_statistics import QuickStatistics
 from logger import debug, info, warning, error, critical
 from config import FILE_IMAGE_LOGO, FILE_SECRETS, FILE_IMAGE_FLAG_PL
 from config import FILE_IMAGE_FLAG_ENG
@@ -74,7 +75,7 @@ def page_home():
 
     def_width = 'w-1/2'
 
-    with ui.column().classes('w-full items-center'):
+    with ui.column().classes('w-full items-center') as parent:
         card_create = ui.card()
         card_create.classes(f'{def_width} items-center')
         card_create.style(f"max-width:{MAX_WIDTH}px; min-width:{MIN_WIDTH}px;")
@@ -84,6 +85,13 @@ def page_home():
             ui.button(lang.Items_in_use, on_click=lambda: ui.open(page_items_in_use)).classes('w-full')
             ui.button(lang.Containers, on_click=lambda: ui.open(page_containers)).classes('w-full')
             ui.button(lang.Locations, on_click=lambda: ui.open(page_locations)).classes('w-full')
+
+        card_statistics = QuickStatistics(
+            app=app,
+            fdata=fdata,
+            parent=parent,
+            classes_width=def_width,
+        )
 
 
 @ui.page('/locations')
