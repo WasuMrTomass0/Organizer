@@ -107,3 +107,16 @@ opt/
 
 Create docker containers with `sudo docker-compose up -d`. 
 Open web page with your machine's ip and port selected in `docker-compose.yaml`.
+
+## Features
+
+- [ ] Advanced search tool options
+- [ ] Scrollable list fot items - instead of aggrid. Cards made out of image and string widgets.
+- [ ] Location tree structure. Locations may have parents and childs
+- [ ] Tags
+- [ ] Summary dialogs for location/container that lists elements in that element
+
+## Known issues
+
+- [ ] Rotated images
+- [ ] RollBack error
