@@ -119,4 +119,4 @@ Open web page with your machine's ip and port selected in `docker-compose.yaml`.
 ## Known issues
 
 - [ ] Rotated images
-- [ ] RollBack error
+- [x] RollBack error
