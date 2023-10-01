@@ -59,6 +59,8 @@ class Database:
         self._session.commit()
 
     def _open_session(self) -> None:
+        if self._session:
+            self._session.rollback()
         self._session = self._SessionClass()
 
     def _close_session(self) -> None:

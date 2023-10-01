@@ -1,5 +1,6 @@
 # Ignored files
 ignored
+note.md
 # Python venv directory
 *\__pycache__
 venv
